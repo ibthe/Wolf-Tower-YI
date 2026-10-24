@@ -24,12 +24,14 @@ async function score({ makeProcess, freePort, forName, profiles, candidates, isC
     const group = candidates.slice(i, i + batch);
     const procs = [];
     try {
+      let reason = '';
       for (const strategy of group) {
         const port = await freePort();
         const proc = makeProcess();
         if (await proc.start(port, forName(strategy))) procs.push({ strategy, port, proc });
+        else reason = proc.lastError || reason;
       }
-      if (!procs.length) throw new Error('не удалось запустить ByeDPI');
+      if (!procs.length) throw new Error('не удалось запустить ByeDPI' + (reason ? ': ' + reason : ''));
       const tasks = [];
       for (const { strategy, port } of procs) {
         for (const profile of profiles) {

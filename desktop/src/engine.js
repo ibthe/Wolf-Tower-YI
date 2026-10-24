@@ -1,9 +1,9 @@
-const { spawn } = require('child_process');
+const { spawn, execFileSync } = require('child_process');
 const EventEmitter = require('events');
 const fs = require('fs');
 const net = require('net');
 const path = require('path');
-const { buildGroups, enabledIds, BASE } = require('./profiles');
+const { buildGroups, enabledIds, supported, BASE } = require('./profiles');
 const { PacServer } = require('./pac');
 const sysproxy = require('./sysproxy');
 
@@ -54,47 +54,92 @@ class ByeDpi extends EventEmitter {
     this.proc = null;
     this.exited = true;
     this.exitCode = null;
+    this.lastError = ''; // причина последнего неудачного запуска (для сообщения пользователю)
+    this.recent = [];
+  }
+
+  /** macOS/Linux: бинарник мог потерять бит исполнения, а на macOS ещё получить карантин после скачивания. */
+  prepareBinary() {
+    if (process.platform === 'win32') return;
+    try {
+      fs.chmodSync(this.bin, 0o755);
+    } catch (_) {
+      /* ignore */
+    }
+    if (process.platform === 'darwin') {
+      try {
+        execFileSync('xattr', ['-d', 'com.apple.quarantine', this.bin], { stdio: 'ignore' });
+      } catch (_) {
+        /* атрибута нет: это нормально */
+      }
+    }
   }
 
   /** true только если процесс жив и порт принимает соединения. */
-  async start(port, args) {
+  async start(port, args, signedRetry = false) {
     if (!fs.existsSync(this.bin)) {
+      this.lastError = `не найден файл ${this.bin}`;
       this.emit('log', `Не найден ${this.bin}`);
       return false;
     }
+    this.prepareBinary();
+    this.recent = [];
     this.emit('log', `Запуск ByeDPI на порту ${port}: ${args.join(' ')}`);
     let proc;
     try {
       proc = spawn(this.bin, ['-i', '127.0.0.1', '-p', String(port), ...args], { windowsHide: true });
     } catch (e) {
+      this.lastError = e.message;
       this.emit('log', `Ошибка запуска: ${e.message}`);
       return false;
     }
     this.proc = proc;
     this.exited = false;
     this.exitCode = null;
-    const onData = (d) => String(d).split(/\r?\n/).filter(Boolean).forEach((l) => this.emit('log', l));
+    const onData = (d) =>
+      String(d)
+        .split(/\r?\n/)
+        .filter(Boolean)
+        .forEach((l) => {
+          this.recent = [...this.recent.slice(-2), l];
+          this.emit('log', l);
+        });
     proc.stdout.on('data', onData);
     proc.stderr.on('data', onData);
     proc.on('error', (e) => {
       this.exited = true;
+      this.lastError = e.code === 'EACCES' ? 'нет права запускать ciadpi (chmod +x)' : e.message;
       this.emit('log', `Ошибка процесса: ${e.message}`);
     });
-    proc.on('exit', (code) => {
+    proc.on('exit', (code, signal) => {
       this.exited = true;
       this.exitCode = code;
+      this.exitSignal = signal;
       this.emit('exit', code);
     });
 
     const deadline = Date.now() + 2500;
     while (Date.now() < deadline) {
       if (this.exited) {
-        this.emit('log', `ByeDPI завершился сразу после запуска (код ${this.exitCode}): порт занят или неверные параметры`);
+        // macOS убивает бинарник без подписи сигналом (код null): подписываем ad hoc и пробуем один раз ещё
+        if (process.platform === 'darwin' && !signedRetry && this.exitSignal && this.exitSignal !== 'SIGTERM') {
+          try {
+            execFileSync('codesign', ['--force', '--sign', '-', this.bin], { stdio: 'ignore' });
+            this.emit('log', `ByeDPI был остановлен системой (${this.exitSignal}): бинарник подписан ad hoc, повтор`);
+            return await this.start(port, args, true);
+          } catch (_) {
+            /* codesign недоступен: сообщаем причину ниже */
+          }
+        }
+        const why = this.exitSignal ? `сигнал ${this.exitSignal}` : `код ${this.exitCode}`;
+        this.lastError = `процесс завершился сразу (${why})` + (this.recent.length ? `: ${this.recent.join(' | ')}` : '');
+        this.emit('log', `ByeDPI завершился сразу после запуска (${why}): порт занят, неверные параметры или система не разрешила запуск`);
         return false;
       }
       if (await canConnect(port)) return true;
       await sleep(80);
     }
+    this.lastError = `не открыл порт ${port} за 2,5 с`;
     this.emit('log', `ByeDPI не открыл порт ${port} за 2,5 с`);
     await this.stop();
     return false;
@@ -154,7 +199,14 @@ class Engine extends EventEmitter {
     const ids = this.enabledIds();
     return this.config.profiles
       .filter((p) => ids.includes(p.id))
-      .map((profile) => ({ profile, strategy: this.strategyFor(profile.id) }));
+      .map((profile) => {
+        let strategy = this.strategyFor(profile.id);
+        if (!supported(strategy)) {
+          this.log(`Стратегия ${strategy} не поддерживается на этой ОС, используется ${this.config.defaultStrategy}`);
+          strategy = this.config.defaultStrategy;
+        }
+        return { profile, strategy };
+      });
   }
 
   async start() {

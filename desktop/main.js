@@ -2,7 +2,7 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, clipboard, shell }
 const fs = require('fs');
 const path = require('path');
 const { Store } = require('./src/store');
-const { loadConfig, forName, parseRaw, enabledIds: enabledOf, BASE } = require('./src/profiles');
+const { loadConfig, forName, parseRaw, supported, enabledIds: enabledOf, BASE } = require('./src/profiles');
 const { Engine, ByeDpi, freePort } = require('./src/engine');
 const { License, readMachineId, loadPublicKey } = require('./src/license');
 const autoprobe = require('./src/autoprobe');
@@ -48,7 +48,7 @@ function snapshot() {
     running: engine.running,
     busy,
     profiles: config.profiles.map((p) => ({ id: p.id, name: p.name })),
-    strategies: config.strategies,
+    strategies: config.strategies.filter((s) => supported(s)),
     enabled: enabledIds(),
     chosen,
     license: {
@@ -116,7 +116,7 @@ async function runProbe() {
   probe = { running: true, done: false, progress: 'Подготовка…', report: '', scores: {} };
   pushState();
   try {
-    const candidates = ['none', ...config.strategies];
+    const candidates = ['none', ...config.strategies.filter((s) => supported(s))];
     const counts = await autoprobe.score({
       makeProcess: () => new ByeDpi(engine.bin),
       freePort,
@@ -268,7 +268,7 @@ ipcMain.handle('profile:strategy', (_e, id, s) => {
   if (engine.running) return false;
   if (!config.profiles.some((p) => p.id === id) || typeof s !== 'string') return false;
   // своя строка в стиле ByeByeDPI: "raw:-d1 -s1+s -a1" (только флаги обхода, см. parseRaw)
-  const ok = s === 'none' || config.strategies.includes(s) || (s.startsWith('raw:') && parseRaw(s.slice(4)) !== null);
+  const ok = (s === 'none' || config.strategies.includes(s) || (s.startsWith('raw:') && parseRaw(s.slice(4)) !== null)) && supported(s);
   if (ok) store.set('strategy_' + id, s);
   pushState();
   return ok;

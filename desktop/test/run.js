@@ -9,7 +9,7 @@ const path = require('path');
 const vm = require('vm');
 const { execFileSync } = require('child_process');
 
-const { buildGroups, loadConfig, forName, parseRaw, enabledIds, BASE } = require('../src/profiles');
+const { buildGroups, loadConfig, forName, parseRaw, enabledIds, supported, BASE } = require('../src/profiles');
 const { buildPac, PacServer } = require('../src/pac');
 const { Store } = require('../src/store');
 const { License } = require('../src/license');
@@ -56,6 +56,25 @@ const config = loadConfig([path.join(root, 'profiles', 'profiles.json')]);
     assert.strictEqual(yt.probeBudgetMs, 4000);
     assert.strictEqual(ig.probeMinBytes, 40000);
     assert.strictEqual(ig.probeBudgetMs, 0);
+  });
+
+  await test('macOS: стратегии с fake/ttl/sack недоступны, остальные работают', () => {
+    const bad = config.strategies.filter((n) => !supported(n, 'darwin'));
+    assert(bad.includes('fake+disorder') && bad.includes('oob-sack') && bad.includes('chain-fake'));
+    assert(supported('split+disorder', 'darwin') && supported('chain', 'darwin') && supported('disorder', 'darwin'));
+    assert(supported('none', 'darwin'));
+    assert.strictEqual(supported('raw:-f-1 -t 8 -d1', 'darwin'), false);
+    assert.strictEqual(supported('raw:-d1 -s1+s -a1', 'darwin'), true);
+    assert(config.strategies.every((n) => supported(n, 'linux') && supported(n, 'win32')));
+    assert(config.strategies.filter((n) => supported(n, 'darwin')).length >= 15, 'на macOS остаётся достаточно вариантов');
+  });
+
+  await test('подбор: причина неудачного запуска ByeDPI попадает в сообщение об ошибке', async () => {
+    const { score } = require('../src/autoprobe');
+    await assert.rejects(
+      score({ makeProcess: () => ({ start: async () => false, lastError: 'не найден файл ciadpi', stop: async () => {} }),
+        freePort: async () => 1, forName: () => [], profiles: config.profiles, candidates: ['none'], isCancelled: () => false, onProgress() {} }),
+      /не удалось запустить ByeDPI: не найден файл ciadpi/);
   });
 
   await test('включённые сервисы: по умолчанию оба, затем выбор пользователя', () => {

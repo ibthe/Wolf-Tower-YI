@@ -58,3 +58,21 @@
 - Desktop: `cd desktop && npm install && npm test` (тесты) и `npm start`.
 - Android: как раньше, через Gradle/CI. `profiles/profiles.json` копируется в ассеты сборкой.
 - Проверка стратегий на реальном ByeDPI: `make -C third_party/byedpi`, затем `WT_TEST_CIADPI=$PWD/third_party/byedpi/ciadpi node desktop/test/run.js`.
+
+## 6. macOS: «не удалось запустить ByeDPI»
+
+Причины, которые нашлись в коде, и что исправлено:
+
+1. **ByeDPI на macOS собирается без `FAKE_SUPPORT` и `TIMEOUT_SUPPORT`** (`params.h`): флагов `-f -t -S -Y -T` там нет, процесс с ними сразу завершается. Стратегии `fake*`, `chain-fake`, `oob-sack` на macOS теперь не предлагаются и не запускаются (остаётся 20 из 29), а сохранённую неподдерживаемую стратегию движок заменяет на `split+disorder`.
+2. **Подбор падал с общей фразой**. Теперь в ошибке указана причина (нет файла, нет прав, процесс убит системой, текст ошибки ByeDPI).
+3. **Бинарник без бита исполнения / с карантином / без подписи** (на Apple Silicon такой процесс убивается сигналом): приложение само делает `chmod 755`, снимает `com.apple.quarantine`, а при убийстве сигналом подписывает `ciadpi` ad hoc и повторяет запуск. Сборка дополнительно подписывает `ciadpi` отдельно: `codesign --deep` не подписывает бинарники в `Resources`.
+4. **Запуск из исходников** (`npm start`) требует собранный ciadpi в `desktop/resources/bin/darwin/`:
+
+```
+make -C third_party/byedpi
+mkdir -p desktop/resources/bin/darwin
+cp third_party/byedpi/ciadpi desktop/resources/bin/darwin/ciadpi
+chmod +x desktop/resources/bin/darwin/ciadpi
+```
+
+Если ошибка остаётся, пришлите текст после двоеточия («не удалось запустить ByeDPI: …») или журнал из приложения.

@@ -123,6 +123,16 @@ function loadConfig(paths) {
   throw new Error('Не найден profiles.json');
 }
 
+/**
+ * ByeDPI на macOS собирается без FAKE_SUPPORT и TIMEOUT_SUPPORT (params.h): флагов -f -t -S -Y -T там нет,
+ * и процесс с ними сразу завершается с ошибкой параметров. Такие стратегии на macOS не предлагаются и не запускаются.
+ */
+function supported(strategy, platform = process.platform) {
+  if (platform !== 'darwin') return true;
+  const args = strategy.startsWith('raw:') ? parseRaw(strategy.slice(4)) : forName(strategy);
+  return Array.isArray(args) && !args.some((t) => /^-[ftSYT]/.test(t));
+}
+
 /** Включённые сервисы: сохранённый выбор, а пока его нет, все из конфигурации. */
 function enabledIds(config, store) {
   const all = config.profiles.map((p) => p.id);
@@ -130,4 +140,4 @@ function enabledIds(config, store) {
   return Array.isArray(saved) ? all.filter((id) => saved.includes(id)) : all;
 }
 
-module.exports = { BASE, enabledIds, LIBRARY, forName, parseRaw, buildGroups, parseConfig, loadConfig };
+module.exports = { BASE, supported, enabledIds, LIBRARY, forName, parseRaw, buildGroups, parseConfig, loadConfig };
