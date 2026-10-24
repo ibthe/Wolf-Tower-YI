@@ -1,0 +1,98 @@
+{
+  "version": 6,
+  "strategies": [
+    "split+disorder",
+    "disorder",
+    "split",
+    "tlsrec",
+    "split+tlsrec",
+    "disorder+tlsrec",
+    "oob",
+    "disoob",
+    "oob+tlsrec",
+    "chain",
+    "chain-oob",
+    "chain-mix",
+    "chain-mix2",
+    "chain-dis",
+    "chain-tlsrec",
+    "chain-fine",
+    "oob-rec-split",
+    "fake+disorder",
+    "fake6+disorder",
+    "fake4+disorder",
+    "fake3+disorder",
+    "fake12+disorder",
+    "fake+split",
+    "fake+oob",
+    "fake+tlsrec",
+    "chain-fake",
+    "oob-sack",
+    "disorder0",
+    "split0"
+  ],
+  "profiles": [
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "android_packages": [
+        "com.google.android.youtube",
+        "com.google.android.apps.youtube.music",
+        "com.google.android.apps.youtube.mango",
+        "com.google.android.apps.youtube.creator",
+        "app.revanced.android.youtube",
+        "app.revanced.android.apps.youtube.music"
+      ],
+      "domains": [
+        "youtube.com",
+        "youtu.be",
+        "youtube-nocookie.com",
+        "youtubekids.com",
+        "googlevideo.com",
+        "ytimg.com",
+        "ggpht.com",
+        "yt3.googleusercontent.com",
+        "youtubei.googleapis.com",
+        "youtube.googleapis.com",
+        "jnn-pa.googleapis.com"
+      ],
+      "probe_hosts": [
+        "www.youtube.com",
+        "i.ytimg.com",
+        "redirector.googlevideo.com",
+        "youtubei.googleapis.com"
+      ],
+      "probe_min_bytes": 100000,
+      "probe_budget_ms": 4000,
+      "block_quic": true,
+      "match_all": false
+    },
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "android_packages": [
+        "com.instagram.android",
+        "com.instagram.lite"
+      ],
+      "domains": [
+        "instagram.com",
+        "cdninstagram.com",
+        "instagr.am",
+        "ig.me",
+        "fbcdn.net",
+        "facebook.com",
+        "facebook.net",
+        "fb.com",
+        "fbsbx.com"
+      ],
+      "probe_hosts": [
+        "www.instagram.com",
+        "i.instagram.com",
+        "graph.instagram.com",
+        "scontent.cdninstagram.com"
+      ],
+      "block_quic": true,
+      "match_all": false
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+name: Android build
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # На ubuntu-latest Android SDK уже установлен (ANDROID_HOME),
+      # поэтому отдельный setup-android не нужен: он падает на пакете 'tools'.
+      - name: Install NDK and CMake
+        run: |
+          SDKM=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | head -1)
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "ndk;26.1.10909125" "cmake;3.22.1" "platforms;android-34" "build-tools;34.0.0"
+
+      # Если в репозитории заданы секреты WT_KEYSTORE_*, APK подписывается вашим постоянным ключом
+      - name: Prepare signing key (if secrets are set)
+        env:
+          KS: ${{ secrets.WT_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.WT_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.WT_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.WT_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/wt.jks"
+            echo "WT_KEYSTORE_FILE=$RUNNER_TEMP/wt.jks" >> "$GITHUB_ENV"
+            echo "WT_KEYSTORE_PASSWORD=$KS_PASS" >> "$GITHUB_ENV"
+            echo "WT_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "WT_KEY_PASSWORD=$KEY_PASS" >> "$GITHUB_ENV"
+            echo "Подпись: постоянный ключ"
+          else
+            echo "Подпись: временный debug-ключ (секреты не заданы)"
+          fi
+
+      - uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
+
+      - name: Build debug APK
+        run: gradle -p android assembleDebug
+
+      - name: Build release APK (only with signing key)
+        run: |
+          if [ -n "$WT_KEYSTORE_FILE" ]; then gradle -p android assembleRelease; fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wolf-tower-apk
+          path: android/app/build/outputs/apk/**/*.apk

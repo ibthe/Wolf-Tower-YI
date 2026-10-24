@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Тёмная тема без action bar; фон окна совпадает с фоном интерфейса, чтобы не было белой вспышки при запуске -->
+    <style name="Theme.WolfTower" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/wt_bg</item>
+        <item name="android:statusBarColor">@color/wt_bg</item>
+        <item name="android:navigationBarColor">@color/wt_bg</item>
+    </style>
+</resources>

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+# Эти файлы создаёт scripts/prepare.js из общих источников проекта
+resources/profiles.json
+resources/license_public_key.txt
+resources/third_party_licenses.txt
+# Ядро ByeDPI кладёт сборка (GitHub Actions)
+resources/bin/

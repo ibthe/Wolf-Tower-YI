@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wolf Tower</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header class="top">
+      <img class="logo" src="logo.png" alt="">
+      <div>
+        <h1>Wolf Tower</h1>
+        <div class="sub">Разблокировка YouTube и Instagram</div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <button id="toggle" class="power" aria-label="Включить или выключить защиту">
+        <span class="ring r1"></span>
+        <span class="ring r2"></span>
+        <span class="disc">
+          <svg viewBox="0 0 24 24" class="power-ico" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M12 3.2v8.2"></path>
+            <path d="M7 6.4a7.6 7.6 0 1 0 10 0"></path>
+          </svg>
+        </span>
+      </button>
+      <div id="status" class="headline"></div>
+      <div id="hint" class="muted"></div>
+    </section>
+
+    <section class="card" id="services">
+      <h2>Сервисы</h2>
+      <div id="svcList" class="svc-list"></div>
+      <div id="svcNote" class="muted small" hidden>Чтобы изменить набор сервисов, сначала остановите защиту.</div>
+    </section>
+
+    <div id="licenseChip" class="license-chip" hidden>
+      <svg viewBox="0 0 24 24" class="ico key" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="8" cy="8.5" r="4.6"></circle>
+        <path d="M11.4 12l9 9"></path>
+        <path d="M16.4 17l2.6-2.6"></path>
+      </svg>
+      <div>
+        <div id="licTitle" class="lic-title"></div>
+        <div id="licSub" class="muted small"></div>
+      </div>
+    </div>
+
+    <section class="card" id="keyCard" hidden>
+      <h2>Активация</h2>
+      <div id="licenseText" class="muted small"></div>
+      <div class="muted small">ID устройства (нужен для ключа с привязкой)</div>
+      <div id="deviceId" class="mono idbox"></div>
+      <div class="row">
+        <button id="copyId" class="pill copy">
+          <svg class="ico ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="11" height="12" rx="2.5"></rect>
+            <path d="M5.5 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v.5"></path>
+          </svg>
+          <svg class="ico ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 12.8l5 5 10-11"></path>
+          </svg>
+          <span class="lbl">Копировать ID</span>
+        </button>
+      </div>
+      <input id="keyInput" type="text" placeholder="Лицензионный ключ" spellcheck="false" autocomplete="off">
+      <div class="row">
+        <button id="activate" class="btn">Активировать</button>
+        <button id="paste" class="btn ghost">Вставить</button>
+        <button id="keyCancel" class="btn ghost" hidden>Отмена</button>
+      </div>
+      <div id="licenseMsg" class="amber small"></div>
+    </section>
+
+    <section class="card">
+      <h2>Стратегия обхода</h2>
+      <div class="muted small">Для каждого сервиса подбирается свой вариант. Проверка YouTube учитывает и скорость: замедление, при котором страница открывается, но медленно, не засчитывается как успех.</div>
+      <button id="probeBtn" class="btn ghost full">Подобрать автоматически</button>
+      <div id="probeProgress" class="muted small"></div>
+      <button id="probeCancel" class="btn ghost" hidden>Отмена</button>
+      <pre id="probeReport" class="small muted"></pre>
+    </section>
+
+    <button id="advToggle" class="adv-toggle">
+      <span>Дополнительно</span>
+      <svg id="advChevron" class="ico chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9l6 6 6-6"></path>
+      </svg>
+    </button>
+
+    <div id="adv" class="stack" hidden>
+      <section class="card">
+        <h3>Выбрать стратегию вручную</h3>
+        <div id="advSvc" class="chips"></div>
+        <div id="chips" class="chips"></div>
+        <div class="muted small">Своя строка (формат ByeByeDPI), например: -s1+s -d3+s -r1+s</div>
+        <input id="rawInput" type="text" placeholder="Аргументы обхода" spellcheck="false" autocomplete="off">
+        <div id="rawErr" class="amber small"></div>
+        <div class="row"><button id="rawApply" class="btn ghost">Применить</button></div>
+      </section>
+
+      <section class="card">
+        <div class="row between">
+          <h3 id="logTitle">Лог</h3>
+          <button id="logToggle" class="link">Развернуть</button>
+        </div>
+        <div id="logLast" class="muted small ellipsis"></div>
+        <div id="logBox" hidden>
+          <pre id="logText" class="log mono small"></pre>
+          <div class="row">
+            <button id="logCopy" class="pill copy">
+              <svg class="ico ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="11" height="12" rx="2.5"></rect>
+                <path d="M5.5 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v.5"></path>
+              </svg>
+              <svg class="ico ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.5 12.8l5 5 10-11"></path>
+              </svg>
+              <span class="lbl">Копировать лог</span>
+            </button>
+            <button id="logClear" class="btn ghost">Очистить</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <button id="newKeyBtn" class="btn ghost full" hidden>Ввести другой ключ</button>
+        <button id="diag" class="pill copy full-pill">
+          <svg class="ico ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="11" height="12" rx="2.5"></rect>
+            <path d="M5.5 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v.5"></path>
+          </svg>
+          <svg class="ico ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 12.8l5 5 10-11"></path>
+          </svg>
+          <span class="lbl">Скопировать диагностику</span>
+        </button>
+        <div class="muted small">В отчёт не попадают IP-адреса, трафик и сам ключ.</div>
+        <button id="licensesToggle" class="link">Лицензии компонентов</button>
+        <pre id="licensesText" class="small muted" hidden></pre>
+      </section>
+
+      <section class="card small muted">
+        <b>Что покрывает версия для компьютера.</b> Через защиту идёт YouTube и Instagram в браузерах и в других программах,
+        которые используют системные настройки прокси. QUIC (HTTP/3) через прокси не используется, браузер переходит на TCP, где приёмы обхода работают. <span id="platformNote"></span>
+      </section>
+    </div>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>

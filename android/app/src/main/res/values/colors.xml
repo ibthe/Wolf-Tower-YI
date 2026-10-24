@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Рамка адаптивной иконки: тёмный фон YouTube. Сам логотип (градиент Instagram) закрывает всю видимую область. -->
+    <color name="ic_launcher_background">#0F0F0F</color>
+    <color name="wt_bg">#0F0F0F</color>
+</resources>

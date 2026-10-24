@@ -1,0 +1,11 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.cxx/
+
+# Лицензионные ключи: приватный ключ НИКОГДА не коммитить
+*.pem
+private_key*
+tools/license/private*

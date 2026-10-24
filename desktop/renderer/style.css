@@ -1,0 +1,134 @@
+:root {
+  --bg-top: #1a0e16; --bg: #0f0f0f; --surface: #1c1c1c; --surface-hi: #272727; --outline: #3a3a3a;
+  --green: #ff0000; --glow: #ff4e45; --deep: #4a1015; --on-green: #fff; --amber: #ffb020;
+  --ok: #0095f6; --ig: linear-gradient(135deg, #feda75, #fa7e1e 28%, #d62976 55%, #962fbf 78%, #4f5bd5);
+  --text: #f1f1f1; --dim: #aaaaaa;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body {
+  margin: 0; min-height: 100vh; color: var(--text);
+  background: linear-gradient(180deg, var(--bg-top), var(--bg) 480px);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+main { max-width: 520px; margin: 0 auto; padding: 22px 18px 34px; display: flex; flex-direction: column; gap: 16px; }
+h1 { font-size: 21px; margin: 0; font-weight: 700; }
+h2 { font-size: 17px; margin: 0; font-weight: 600; }
+h3 { font-size: 15px; margin: 0; font-weight: 600; }
+.sub, .muted { color: var(--dim); }
+.amber { color: var(--amber); }
+.small { font-size: 12.5px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; user-select: text; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.between { justify-content: space-between; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+
+.top { display: flex; align-items: center; gap: 12px; }
+.logo { width: 46px; height: 46px; border-radius: 13px; display: block; }
+
+/* ---------- кнопка включения ---------- */
+.hero { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 4px; }
+.headline { font-size: 22px; font-weight: 600; margin-top: 4px; transition: color .25s; }
+.power {
+  position: relative; width: 220px; height: 220px; border: none; background: transparent; padding: 0;
+  display: grid; place-items: center; cursor: pointer; color: var(--text);
+}
+.power:disabled { cursor: default; }
+.disc {
+  position: relative; z-index: 2; width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center;
+  background: linear-gradient(180deg, #2e2e2e, #1a1a1a); color: var(--text);
+  box-shadow: 0 0 0 1px var(--outline) inset; transition: background .3s, color .3s, transform .15s;
+}
+.power:not(:disabled):hover .disc { transform: scale(1.03); }
+.power:disabled .disc { color: var(--dim); }
+.power-ico { width: 58px; height: 58px; }
+.ring { position: absolute; border-radius: 50%; pointer-events: none; }
+.ring.r1 { width: 168px; height: 168px; border: 2px solid var(--outline); transition: border-color .3s; }
+.ring.r2 { width: 168px; height: 168px; border: 2px solid var(--green); opacity: 0; }
+.power.on .disc { background: linear-gradient(180deg, #ff4e45, #cc0000); color: #fff; box-shadow: 0 0 40px rgba(255, 0, 60, .35), 0 0 0 4px #0f0f0f, 0 0 0 7px #d62976; }
+.power.on .ring.r1 { border-color: rgba(150, 47, 191, .6); }
+.power.on .ring.r2 { animation: pulse 2.4s ease-out infinite; }
+.power.busy .ring.r1 { border-color: var(--green); border-top-color: transparent; animation: spin 1s linear infinite; }
+.power.busy .power-ico { opacity: .45; }
+.on-text { color: var(--glow); }
+@keyframes pulse { 0% { transform: scale(.95); opacity: .55; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- лицензия ---------- */
+.license-chip {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--outline);
+}
+.license-chip .key { color: var(--ok); }
+.license-chip.soon .key { color: var(--amber); }
+.license-chip.soon #licSub { color: var(--amber); }
+.lic-title { font-weight: 500; font-size: 15px; }
+.ico { width: 22px; height: 22px; flex: none; }
+.idbox { background: var(--surface-hi); border-radius: 14px; padding: 14px; font-size: 20px; font-weight: 600; letter-spacing: 1px; }
+
+/* ---------- карточки и кнопки ---------- */
+.card {
+  background: var(--surface); border: 1px solid var(--outline); border-radius: 20px; padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+button { font: inherit; color: inherit; }
+.btn {
+  padding: 10px 16px; border-radius: 14px; border: 1px solid var(--green); background: var(--green);
+  color: var(--on-green); font-weight: 600; cursor: pointer; transition: opacity .15s, background .15s;
+}
+.btn.ghost { background: transparent; border-color: var(--outline); color: var(--text); font-weight: 500; }
+.btn.ghost:not(:disabled):hover { background: var(--surface-hi); }
+.btn.full { width: 100%; }
+.btn:disabled { opacity: .45; cursor: default; background: var(--surface-hi); border-color: var(--outline); color: var(--dim); }
+.link { background: transparent; border: none; color: var(--green); padding: 4px 6px; cursor: pointer; text-align: left; }
+input[type=text] {
+  width: 100%; padding: 11px 13px; border-radius: 14px; border: 1px solid var(--outline);
+  background: var(--bg); color: var(--text); font: inherit; outline: none; transition: border-color .15s;
+}
+input[type=text]:focus { border-color: var(--green); }
+.log { max-height: 220px; overflow-y: auto; background: var(--bg); border-radius: 12px; padding: 10px; color: var(--dim); }
+
+/* кнопка «копировать»: после нажатия значок и подпись меняются */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--outline); cursor: pointer; font-weight: 500; font-size: 14px;
+  transition: background .2s, border-color .2s, color .2s;
+}
+.pill .ico { width: 18px; height: 18px; }
+.pill .ico-check { display: none; }
+.pill.copied { background: var(--ok); border-color: var(--ok); color: #fff; }
+.pill.copied .ico-copy { display: none; }
+.pill.copied .ico-check { display: block; }
+.full-pill { width: 100%; justify-content: center; }
+
+/* ---------- дополнительно ---------- */
+.adv-toggle {
+  display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 4px;
+  background: transparent; border: none; color: var(--dim); font-weight: 500; font-size: 15px; cursor: pointer;
+}
+.chevron { width: 22px; height: 22px; transition: transform .2s; }
+.adv-toggle.open .chevron { transform: rotate(180deg); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 7px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--outline);
+  color: var(--text); font-size: 13px; cursor: pointer;
+}
+.chip.on { background: var(--deep); border-color: var(--green); color: #fff; }
+.chip:disabled { opacity: .5; cursor: default; }
+
+/* ---- сервисы: значок, название, переключатель (красный у YouTube, розовый у Instagram) */
+.svc-list { display: grid; gap: 12px; }
+.svc { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.svc-ico { width: 36px; height: 36px; flex: none; }
+.svc-ico svg { width: 100%; height: 100%; display: block; }
+.svc-txt { flex: 1; display: grid; gap: 2px; }
+.switch { appearance: none; -webkit-appearance: none; width: 46px; height: 28px; border-radius: 14px; background: var(--surface-hi);
+  border: 1px solid var(--outline); position: relative; cursor: pointer; transition: background .2s; flex: none; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--dim); transition: transform .2s, background .2s; }
+.switch:checked { background: #ff0000; border-color: transparent; }
+.switch.instagram:checked { background: #d62976; }
+.switch:checked::after { transform: translateX(18px); background: #fff; }
+.switch:disabled { opacity: .5; cursor: default; }
