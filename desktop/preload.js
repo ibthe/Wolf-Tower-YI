@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('wt', {
   getState: () => ipcRenderer.invoke('state:get'),
   getLogs: () => ipcRenderer.invoke('log:get'),
   setStrategy: (id, s) => ipcRenderer.invoke('profile:strategy', id, s),
+  setLang: (code) => ipcRenderer.invoke('lang:set', code),
   setEnabled: (id, on) => ipcRenderer.invoke('profile:enabled', id, on),
   toggleProtection: () => ipcRenderer.invoke('protection:toggle'),
   activate: (key) => ipcRenderer.invoke('license:activate', key),

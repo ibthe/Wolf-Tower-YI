@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.wolftower.app"
+        applicationId = "com.wolftower.ytig" // отдельный пакет: ставится рядом с версией для WhatsApp без конфликта подписи
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -43,6 +43,8 @@ android {
 
     // profiles/profiles.json общий для всех платформ и попадает в assets
     sourceSets["main"].assets.srcDir("../../profiles")
+    // i18n/translations.json: переводы (английский, чеченский), общие с версией для компьютера
+    sourceSets["main"].assets.srcDir("../../i18n")
 
     buildFeatures { compose = true }
     composeOptions { kotlinCompilerExtensionVersion = "1.5.14" }

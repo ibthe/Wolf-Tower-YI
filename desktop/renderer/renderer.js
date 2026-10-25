@@ -7,13 +7,44 @@ let justActivated = false;
 let logs = [];
 let rawTouched = false;
 
+let LANG = 'ru';
+let DICT = {};
+const tr = (ru) => (LANG === 'ru' ? ru : DICT[ru] || ru);
+const trf = (ru, ...a) => tr(ru).replace(/\{(\d+)\}/g, (m, i) => (a[i] !== undefined ? String(a[i]) : m));
+
+/** Форма слова при числе: русский (3 формы), английский (1 / много), чеченский (после числа не меняется). */
 function plural(n, one, few, many) {
+  if (LANG === 'en') return tr(n === 1 ? one : few);
+  if (LANG === 'ce') return tr(one);
   const m100 = n % 100;
   const m10 = n % 10;
   if (m100 >= 11 && m100 <= 14) return many;
   if (m10 === 1) return one;
   if (m10 >= 2 && m10 <= 4) return few;
   return many;
+}
+
+/** Статичные тексты страницы: ключ в атрибуте data-i18n (или в тексте элемента). */
+function applyI18n() {
+  document.documentElement.lang = LANG;
+  for (const el of document.querySelectorAll('[data-i18n]')) {
+    if (!el.dataset.ru) el.dataset.ru = el.textContent.trim().replace(/\s+/g, ' ');
+    el.textContent = tr(el.dataset.ru);
+  }
+  for (const el of document.querySelectorAll('[data-i18n-ph]')) el.placeholder = tr(el.dataset.i18nPh);
+  for (const el of document.querySelectorAll('[data-i18n-aria]')) el.setAttribute('aria-label', tr(el.dataset.i18nAria));
+}
+
+function renderLang() {
+  const box = $('langRow');
+  box.textContent = '';
+  for (const [code, name] of S.langs) {
+    const b = document.createElement('button');
+    b.className = 'chip' + (code === LANG ? ' on' : '');
+    b.textContent = name;
+    b.addEventListener('click', () => window.wt.setLang(code));
+    box.append(b);
+  }
 }
 
 /** "142 дня" / "5 часов" до конца срока; null, если лицензия бессрочная или срок вышел. */
@@ -28,8 +59,8 @@ function leftText(untilMs) {
 }
 
 function strategyLabel(s) {
-  if (s === 'none') return 'без обхода';
-  if (s.startsWith('raw:')) return 'своя строка';
+  if (s === 'none') return tr('без обхода');
+  if (s.startsWith('raw:')) return tr('своя строка');
   return s;
 }
 
@@ -41,11 +72,11 @@ function setupCopyButton(btn, getText) {
   btn.addEventListener('click', async () => {
     await window.wt.copyText(getText());
     btn.classList.add('copied');
-    lbl.textContent = 'Скопировано';
+    lbl.textContent = tr('Скопировано');
     clearTimeout(timer);
     timer = setTimeout(() => {
       btn.classList.remove('copied');
-      lbl.textContent = normal;
+      lbl.textContent = tr(normal);
     }, 2000);
   });
 }
@@ -68,12 +99,12 @@ function renderServices() {
     ico.innerHTML = GLYPH[p.id] || ''; // значки задаются в коде (константы выше), пользовательских данных тут нет
     const txt = document.createElement('span');
     txt.className = 'svc-txt';
-    const score = S.probe.scores && S.probe.scores[p.id] ? ` (проверка: ${S.probe.scores[p.id]})` : '';
+    const score = S.probe.scores && S.probe.scores[p.id] ? trf(' (проверка: {0})', S.probe.scores[p.id]) : '';
     const name = document.createElement('b');
     name.textContent = p.name;
     const sub = document.createElement('span');
     sub.className = 'muted small';
-    sub.textContent = `Стратегия: ${strategyLabel(S.chosen[p.id])}${score}`;
+    sub.textContent = `${tr('Стратегия: ')}${strategyLabel(S.chosen[p.id])}${score}`;
     txt.append(name, sub);
     const sw = document.createElement('input');
     sw.type = 'checkbox';
@@ -118,11 +149,11 @@ function renderChips(profile) {
 }
 
 function renderLog() {
-  $('logTitle').textContent = `Лог (${logs.length})`;
-  $('logToggle').textContent = logOpen ? 'Свернуть' : 'Развернуть';
+  $('logTitle').textContent = trf('Лог ({0})', logs.length);
+  $('logToggle').textContent = logOpen ? tr('Свернуть') : tr('Развернуть');
   $('logLast').hidden = logOpen;
   $('logBox').hidden = !logOpen;
-  $('logLast').textContent = logs.length ? logs[logs.length - 1] : 'Пока пусто';
+  $('logLast').textContent = logs.length ? logs[logs.length - 1] : tr('Пока пусто');
   if (logOpen) {
     const pre = $('logText');
     pre.textContent = logs.slice(-100).join('\n');
@@ -132,10 +163,14 @@ function renderLog() {
 
 function render() {
   if (!S) return;
+  LANG = S.lang || 'ru';
+  DICT = S.dict || {};
+  applyI18n();
+  renderLang();
   if (!advId || !S.profiles.some((p) => p.id === advId)) advId = S.profiles[0].id;
   const profile = S.profiles.find((p) => p.id === advId);
   const chosen = S.profiles.filter((p) => S.enabled.includes(p.id));
-  const names = chosen.map((p) => p.name).join(' и ');
+  const names = chosen.map((p) => p.name).join(tr(' и '));
   const canRun = S.license.licensed;
   const busy = S.busy || S.probe.running;
 
@@ -146,20 +181,20 @@ function render() {
   t.disabled = busy || (!S.running && (!canRun || !chosen.length));
   const head = $('status');
   head.textContent = S.running
-    ? 'Защита включена'
+    ? tr('Защита включена')
     : S.probe.running
-      ? 'Подбор стратегии…'
+      ? tr('Подбор стратегии…')
       : S.busy
-        ? 'Проверка лицензии…'
-        : 'Защита выключена';
+        ? tr('Проверка лицензии…')
+        : tr('Защита выключена');
   head.classList.toggle('on-text', S.running);
   $('hint').textContent = S.running
-    ? `${names} ${chosen.length === 1 ? 'идёт' : 'идут'} через обход`
+    ? trf(chosen.length === 1 ? '{0} идёт через обход' : '{0} идут через обход', names)
     : !canRun
-      ? 'Для запуска введите лицензионный ключ'
+      ? tr('Для запуска введите лицензионный ключ')
       : !chosen.length
-        ? 'Включите хотя бы один сервис ниже'
-        : `Нажмите кнопку, чтобы разблокировать ${names}`;
+        ? tr('Включите хотя бы один сервис ниже')
+        : trf('Нажмите кнопку, чтобы разблокировать {0}', names);
   $('hint').classList.toggle('amber', !S.running && (!canRun || !chosen.length));
   renderServices();
 
@@ -171,8 +206,8 @@ function render() {
     const left = leftText(S.license.untilMs);
     const soon = typeof S.license.untilMs === 'number' && S.license.untilMs - Date.now() < 7 * 86400000;
     $('licenseChip').classList.toggle('soon', soon);
-    $('licTitle').textContent = justActivated ? 'Ключ принят' : S.license.plan === 'trial' ? 'Пробная лицензия' : 'Лицензия активна';
-    $('licSub').textContent = left ? `Осталось ${left}` : 'Бессрочная';
+    $('licTitle').textContent = justActivated ? tr('Ключ принят') : S.license.plan === 'trial' ? tr('Пробная лицензия') : tr('Лицензия активна');
+    $('licSub').textContent = left ? trf('Осталось {0}', left) : tr('Бессрочная');
   }
   $('licenseText').textContent = canRun ? '' : S.license.text;
   $('licenseText').hidden = canRun;
@@ -199,9 +234,9 @@ function render() {
   }
   $('platformNote').textContent =
     S.platform === 'darwin'
-      ? 'При первом включении защиты macOS попросит пароль администратора для настройки прокси.'
+      ? tr('При первом включении защиты macOS попросит пароль администратора для настройки прокси.')
       : S.platform === 'win32'
-        ? 'Приложения из Microsoft Store системный прокси могут не учитывать: используйте YouTube и Instagram в браузере.'
+        ? tr('Приложения из Microsoft Store системный прокси могут не учитывать: используйте YouTube и Instagram в браузере.')
         : '';
   renderLog();
 }
@@ -230,10 +265,10 @@ $('paste').addEventListener('click', async () => {
 $('activate').addEventListener('click', async () => {
   const btn = $('activate');
   btn.disabled = true;
-  btn.textContent = 'Проверка…';
+  btn.textContent = tr('Проверка…');
   const err = await window.wt.activate($('keyInput').value);
   btn.disabled = false;
-  btn.textContent = 'Активировать';
+  btn.textContent = tr('Активировать');
   $('licenseMsg').textContent = err || '';
   if (!err) {
     $('keyInput').value = '';
@@ -254,7 +289,7 @@ $('rawApply').addEventListener('click', async () => {
   const text = $('rawInput').value.trim();
   if (!text) return;
   const ok = await window.wt.setStrategy(advId, 'raw:' + text);
-  $('rawErr').textContent = ok ? '' : 'Допустимы только флаги обхода: -s -d -o -q -f -t -r -a и т.п.';
+  $('rawErr').textContent = ok ? '' : tr('Допустимы только флаги обхода: -s -d -o -q -f -t -r -a и т.п.');
   if (ok) rawTouched = false;
 });
 $('logToggle').addEventListener('click', () => {
@@ -275,11 +310,11 @@ $('logClear').addEventListener('click', async () => {
   btn.addEventListener('click', async () => {
     await window.wt.copyDiag();
     btn.classList.add('copied');
-    lbl.textContent = 'Скопировано';
+    lbl.textContent = tr('Скопировано');
     clearTimeout(timer);
     timer = setTimeout(() => {
       btn.classList.remove('copied');
-      lbl.textContent = normal;
+      lbl.textContent = tr(normal);
     }, 2000);
   });
 })();

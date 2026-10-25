@@ -91,12 +91,12 @@ class DpiVpnService : VpnService() {
     private fun startAll() {
         if (running.value) return
         if (!LicenseManager.canRun(this)) {
-            fail("Нужен лицензионный ключ")
+            fail(tr("Нужен лицензионный ключ"))
             return
         }
         val args = buildByeArgs()
         if (args == null) {
-            fail("Не выбран ни один сервис")
+            fail(tr("Не выбран ни один сервис"))
             return
         }
         goForeground()
@@ -108,7 +108,7 @@ class DpiVpnService : VpnService() {
 
         val proc = ByeDpiProcess(this)
         if (!proc.start(byePort, args, ::appendLog)) {
-            fail("ByeDPI не запустился")
+            fail(tr("ByeDPI не запустился"))
             return
         }
         synchronized(lock) { byeDpi = proc }
@@ -116,7 +116,7 @@ class DpiVpnService : VpnService() {
         if (doh) {
             val s = DohSocksShim(socksPort, byePort, ::appendLog)
             if (!s.start()) {
-                fail("DoH-прокси не запустился")
+                fail(tr("DoH-прокси не запустился"))
                 return
             }
             shim = s
@@ -143,12 +143,12 @@ class DpiVpnService : VpnService() {
 
         val fd = builder.establish()
         if (fd == null) {
-            fail("Не удалось создать VPN-интерфейс")
+            fail(tr("Не удалось создать VPN-интерфейс"))
             return
         }
         tun = fd
         if (!tun2socks.start(fd, "127.0.0.1", socksPort, ::appendLog)) {
-            fail("Туннель не запустился")
+            fail(tr("Туннель не запустился"))
             return
         }
         setRunning(true)
@@ -192,7 +192,7 @@ class DpiVpnService : VpnService() {
             val nm = getSystemService(NotificationManager::class.java)
             if (nm.getNotificationChannel(CHANNEL) == null) {
                 nm.createNotificationChannel(
-                    NotificationChannel(CHANNEL, "Защита", NotificationManager.IMPORTANCE_LOW)
+                    NotificationChannel(CHANNEL, tr("Защита"), NotificationManager.IMPORTANCE_LOW)
                 )
             }
             val stop = PendingIntent.getService(
@@ -204,11 +204,11 @@ class DpiVpnService : VpnService() {
                 this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
             )
             val action = Notification.Action.Builder(
-                Icon.createWithResource(this, R.drawable.ic_tile), "Остановить", stop
+                Icon.createWithResource(this, R.drawable.ic_tile), tr("Остановить"), stop
             ).build()
             val n = Notification.Builder(this, CHANNEL)
                 .setContentTitle("Wolf Tower")
-                .setContentText("Защита включена")
+                .setContentText(tr("Защита включена"))
                 .setSmallIcon(R.drawable.ic_tile)
                 .setOngoing(true)
                 .setContentIntent(open)

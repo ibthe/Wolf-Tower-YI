@@ -4,6 +4,8 @@ const path = require('path');
 const { Store } = require('./src/store');
 const { loadConfig, forName, parseRaw, supported, enabledIds: enabledOf, BASE } = require('./src/profiles');
 const { Engine, ByeDpi, freePort } = require('./src/engine');
+const i18n = require('./src/i18n');
+const { tr, trf } = i18n;
 const { License, readMachineId, loadPublicKey } = require('./src/license');
 const autoprobe = require('./src/autoprobe');
 const { buildReport } = require('./src/diag');
@@ -47,6 +49,9 @@ function snapshot() {
     platform: process.platform,
     running: engine.running,
     busy,
+    lang: i18n.getLang(),
+    langs: i18n.LANGS,
+    dict: i18n.table(),
     profiles: config.profiles.map((p) => ({ id: p.id, name: p.name })),
     strategies: config.strategies.filter((s) => supported(s)),
     enabled: enabledIds(),
@@ -72,13 +77,13 @@ function pushState() {
 function updateTray() {
   if (!tray) return;
   const menu = Menu.buildFromTemplate([
-    { label: 'Открыть Wolf Tower', click: showWindow },
-    { label: engine.running ? 'Выключить защиту' : 'Включить защиту', click: () => toggleProtection() },
+    { label: tr('Открыть Wolf Tower'), click: showWindow },
+    { label: engine.running ? tr('Выключить защиту') : tr('Включить защиту'), click: () => toggleProtection() },
     { type: 'separator' },
-    { label: 'Выход', click: () => app.quit() },
+    { label: tr('Выход'), click: () => app.quit() },
   ]);
   tray.setContextMenu(menu);
-  tray.setToolTip(engine.running ? 'Wolf Tower: защита включена' : 'Wolf Tower: защита выключена');
+  tray.setToolTip(engine.running ? tr('Wolf Tower: защита включена') : tr('Wolf Tower: защита выключена'));
 }
 
 function showWindow() {
@@ -113,7 +118,7 @@ async function runProbe() {
   const profiles = config.profiles.filter((p) => ids.includes(p.id));
   if (probe.running || engine.running || !profiles.length || !license.canRun()) return;
   probeCancel = false;
-  probe = { running: true, done: false, progress: 'Подготовка…', report: '', scores: {} };
+  probe = { running: true, done: false, progress: tr('Подготовка…'), report: '', scores: {} };
   pushState();
   try {
     const candidates = ['none', ...config.strategies.filter((s) => supported(s))];
@@ -125,35 +130,35 @@ async function runProbe() {
       candidates,
       isCancelled: () => probeCancel,
       onProgress: (n) => {
-        probe = { ...probe, progress: `Проверено вариантов: ${n} из ${candidates.length}` };
+        probe = { ...probe, progress: trf('Проверено вариантов: {0} из {1}', n, candidates.length) };
         pushState();
       },
     });
     if (probeCancel) {
-      probe = { running: false, done: true, progress: '', report: 'Подбор отменён, настройки не менялись', scores: {} };
+      probe = { running: false, done: true, progress: '', report: tr('Подбор отменён, настройки не менялись'), scores: {} };
     } else {
       const lines = [];
       const scores = {};
       for (const p of profiles) {
         const total = p.probeHosts.length;
         if (!total) {
-          lines.push(`${p.name}: нет адресов для проверки`);
+          lines.push(trf('{0}: нет адресов для проверки', p.name));
           continue;
         }
         // Проба смотрит только TLS: для match_all-сервиса "без обхода" не выбираем (чат идёт без SNI)
         const { best, ok } = autoprobe.chooseBest(counts[p.id], p.matchAll ? candidates.filter((c) => c !== 'none') : candidates);
         if (!best) {
-          lines.push(`${p.name}: ничего не сработало (0/${total}). Возможна блокировка по IP или подмена DNS.`);
+          lines.push(trf('{0}: ничего не сработало (0/{1}). Возможна блокировка по IP или подмена DNS.', p.name, total));
         } else {
           store.set('strategy_' + p.id, best);
           scores[p.id] = `${ok}/${total}`;
-          lines.push(`${p.name}: ${best === 'none' ? 'обход не нужен' : best} (${ok}/${total})`);
+          lines.push(trf('{0}: {1} ({2}/{3})', p.name, best === 'none' ? tr('обход не нужен') : best, ok, total));
         }
       }
       probe = { running: false, done: true, progress: '', report: lines.join('\n'), scores };
     }
   } catch (e) {
-    probe = { running: false, done: true, progress: '', report: 'Ошибка подбора: ' + e.message, scores: {} };
+    probe = { running: false, done: true, progress: '', report: trf('Ошибка подбора: {0}', e.message), scores: {} };
   }
   pushState();
 }
@@ -195,6 +200,8 @@ function createWindow() {
 
 app.whenReady().then(async () => {
   store = new Store(app.getPath('userData'));
+  i18n.load([path.join(resourcesDir, 'translations.json'), path.join(__dirname, '..', 'i18n', 'translations.json')]);
+  i18n.setLang(store.get('lang', i18n.fromLocale(app.getLocale())));
   config = loadConfig([path.join(resourcesDir, 'profiles.json'), path.join(__dirname, '..', 'profiles', 'profiles.json')]);
   engine = new Engine({ resourcesDir, store, config });
   license = new License({
@@ -291,12 +298,20 @@ ipcMain.handle('probe:cancel', () => {
   probeCancel = true;
 });
 ipcMain.handle('copy', (_e, text) => clipboard.writeText(String(text)));
+ipcMain.handle('lang:set', (_e, code) => {
+  if (!i18n.LANGS.some(([c]) => c === code)) return false;
+  i18n.setLang(code);
+  store.set('lang', code);
+  updateTray();
+  pushState();
+  return true;
+});
 ipcMain.handle('paste', () => clipboard.readText());
 ipcMain.handle('licenses:get', () => {
   try {
     return fs.readFileSync(path.join(resourcesDir, 'third_party_licenses.txt'), 'utf8');
   } catch (_) {
-    return 'Не удалось прочитать файл лицензий';
+    return tr('Не удалось прочитать файл лицензий');
   }
 });
 ipcMain.handle('diag:copy', () => {

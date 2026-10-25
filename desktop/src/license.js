@@ -4,6 +4,8 @@ const https = require('https');
 const os = require('os');
 const { execFile } = require('child_process');
 
+const { tr, trf } = require('./i18n');
+
 const DAY = 24 * 60 * 60 * 1000;
 const CLOCK_TOLERANCE_LOCAL = 2 * DAY; // откат по записи о прошлом запуске
 const CLOCK_TOLERANCE_NET = 60 * 60 * 1000; // расхождение с сетевым временем
@@ -114,31 +116,31 @@ class License {
   verifyKey(key) {
     try {
       const parts = String(key || '').trim().split('.');
-      if (parts.length !== 3 || parts[0] !== 'WT1') return { ok: false, reason: 'Неверный формат ключа' };
+      if (parts.length !== 3 || parts[0] !== 'WT1') return { ok: false, reason: tr('Неверный формат ключа') };
       const payload = Buffer.from(parts[1], 'base64url');
       const sig = Buffer.from(parts[2], 'base64url');
-      if (!this.publicKeyB64) return { ok: false, reason: 'В приложении не задан публичный ключ лицензий' };
+      if (!this.publicKeyB64) return { ok: false, reason: tr('В приложении не задан публичный ключ лицензий') };
       const pub = crypto.createPublicKey({
         key: Buffer.from(this.publicKeyB64.replace(/\s+/g, ''), 'base64'),
         format: 'der',
         type: 'spki',
       });
       if (!crypto.verify('sha256', payload, { key: pub, dsaEncoding: 'der' }, sig)) {
-        return { ok: false, reason: 'Ключ не прошёл проверку подписи' };
+        return { ok: false, reason: tr('Ключ не прошёл проверку подписи') };
       }
       const json = JSON.parse(payload.toString('utf8'));
       const dev = json.dev || '';
-      if (dev && dev !== this.deviceId) return { ok: false, reason: 'Ключ выпущен для другого устройства' };
+      if (dev && dev !== this.deviceId) return { ok: false, reason: tr('Ключ выпущен для другого устройства') };
       const exp = json.exp || '';
       let untilMs = null;
       if (exp) {
         const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(exp);
-        if (!m) return { ok: false, reason: 'Неверный формат ключа' };
+        if (!m) return { ok: false, reason: tr('Неверный формат ключа') };
         untilMs = Date.UTC(+m[1], +m[2] - 1, +m[3]) + DAY; // действует весь указанный день (UTC)
       }
       return { ok: true, plan: json.plan || 'pro', untilMs, untilText: exp || null };
     } catch (_) {
-      return { ok: false, reason: 'Неверный формат ключа' };
+      return { ok: false, reason: tr('Неверный формат ключа') };
     }
   }
 
@@ -190,12 +192,12 @@ class License {
   /** Возвращает текст ошибки или null, если ключ принят и сохранён. */
   async activate(key) {
     if ((await this.networkCheck()) === 'BEHIND') {
-      return 'Время на компьютере отстаёт от сетевого. Включите автоматическое время и повторите.';
+      return tr('Время на компьютере отстаёт от сетевого. Включите автоматическое время и повторите.');
     }
-    if (this.violation()) return 'Нужен интернет, чтобы проверить время после прошлого нарушения.';
+    if (this.violation()) return tr('Нужен интернет, чтобы проверить время после прошлого нарушения.');
     const r = this.verifyKey(key);
     if (!r.ok) return r.reason;
-    if (r.untilMs !== null && this.now() >= r.untilMs) return 'Срок действия этого ключа уже истёк';
+    if (r.untilMs !== null && this.now() >= r.untilMs) return tr('Срок действия этого ключа уже истёк');
     this.store.set('license_key', String(key).trim());
     return null;
   }
@@ -203,15 +205,15 @@ class License {
   describe(s = this.status()) {
     switch (s.kind) {
       case 'licensed': {
-        const kind = s.plan === 'trial' ? 'Пробная лицензия' : 'Лицензия активна';
-        return s.until ? `${kind} до ${s.until}` : `${kind} (бессрочная)`;
+        const kind = s.plan === 'trial' ? tr('Пробная лицензия') : tr('Лицензия активна');
+        return s.until ? trf('{0} до {1}', kind, s.until) : trf('{0} (бессрочная)', kind);
       }
       case 'not_activated':
-        return 'Приложение не активировано. Введите лицензионный или пробный ключ.';
+        return tr('Приложение не активировано. Введите лицензионный или пробный ключ.');
       case 'expired':
-        return 'Срок лицензии истёк. Введите новый ключ.';
+        return tr('Срок лицензии истёк. Введите новый ключ.');
       default:
-        return 'Время на компьютере отстаёт от сетевого, ключ деактивирован. Включите автоматическое время, подключитесь к интернету и введите ключ заново.';
+        return tr('Время на компьютере отстаёт от сетевого, ключ деактивирован. Включите автоматическое время, подключитесь к интернету и введите ключ заново.');
     }
   }
 }

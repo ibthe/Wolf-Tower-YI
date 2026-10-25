@@ -73,21 +73,21 @@ object LicenseManager {
     private fun verifyKey(ctx: Context, key: String): VerifyResult {
         try {
             val parts = key.trim().split(".")
-            if (parts.size != 3 || parts[0] != "WT1") return VerifyResult.Bad("Неверный формат ключа")
+            if (parts.size != 3 || parts[0] != "WT1") return VerifyResult.Bad(tr("Неверный формат ключа"))
             val flags = Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP
             val payload = Base64.decode(parts[1], flags)
             val sig = Base64.decode(parts[2], flags)
 
-            val pub = loadPublicKey(ctx) ?: return VerifyResult.Bad("В приложении не задан публичный ключ лицензий")
+            val pub = loadPublicKey(ctx) ?: return VerifyResult.Bad(tr("В приложении не задан публичный ключ лицензий"))
             val verifier = Signature.getInstance("SHA256withECDSA")
             verifier.initVerify(pub)
             verifier.update(payload)
-            if (!verifier.verify(sig)) return VerifyResult.Bad("Ключ не прошёл проверку подписи")
+            if (!verifier.verify(sig)) return VerifyResult.Bad(tr("Ключ не прошёл проверку подписи"))
 
             val json = JSONObject(String(payload, Charsets.UTF_8))
             val dev = json.optString("dev", "")
             if (dev.isNotEmpty() && dev != deviceId(ctx)) {
-                return VerifyResult.Bad("Ключ выпущен для другого устройства")
+                return VerifyResult.Bad(tr("Ключ выпущен для другого устройства"))
             }
             val exp = json.optString("exp", "")
             var untilMs: Long? = null
@@ -97,7 +97,7 @@ object LicenseManager {
             }
             return VerifyResult.Ok(json.optString("plan", "pro"), untilMs, exp.ifEmpty { null })
         } catch (_: Exception) {
-            return VerifyResult.Bad("Неверный формат ключа")
+            return VerifyResult.Bad(tr("Неверный формат ключа"))
         }
     }
 
@@ -121,17 +121,17 @@ object LicenseManager {
     /** Возвращает текст ошибки или null, если ключ принят и сохранён. ТОЛЬКО из фонового потока. */
     fun activate(ctx: Context, key: String): String? {
         if (networkCheck(ctx) == NetCheck.BEHIND) {
-            return "Время на телефоне отстаёт от сетевого. Включите автоматическое время и повторите."
+            return tr("Время на телефоне отстаёт от сетевого. Включите автоматическое время и повторите.")
         }
         if (violationFlag(ctx)) {
-            return "Нужен интернет, чтобы проверить время после прошлого нарушения."
+            return tr("Нужен интернет, чтобы проверить время после прошлого нарушения.")
         }
         return when (val r = verifyKey(ctx, key)) {
             is VerifyResult.Bad -> r.reason
             is VerifyResult.Ok -> {
                 val until = r.untilMs
                 if (until != null && System.currentTimeMillis() >= until) {
-                    "Срок действия этого ключа уже истёк"
+                    tr("Срок действия этого ключа уже истёк")
                 } else {
                     prefs(ctx).edit().putString("license_key", key.trim()).apply()
                     null
@@ -187,20 +187,20 @@ object LicenseManager {
         val left = until - System.currentTimeMillis()
         if (left <= 0) return null
         val days = left / DAY_MS
-        if (days >= 1) return "$days " + ruPlural(days, "день", "дня", "дней")
+        if (days >= 1) return "$days " + I18n.plural(days, "день", "дня", "дней")
         val hours = maxOf(1L, left / (60L * 60 * 1000))
-        return "$hours " + ruPlural(hours, "час", "часа", "часов")
+        return "$hours " + I18n.plural(hours, "час", "часа", "часов")
     }
 
     fun describe(s: LicenseStatus): String = when (s) {
         is LicenseStatus.Licensed -> {
-            val kind = if (s.plan == "trial") "Пробная лицензия" else "Лицензия активна"
-            if (s.until == null) "$kind (бессрочная)" else "$kind до ${s.until}"
+            val kind = if (s.plan == "trial") tr("Пробная лицензия") else tr("Лицензия активна")
+            if (s.until == null) trf("{0} (бессрочная)", kind) else trf("{0} до {1}", kind, s.until)
         }
         LicenseStatus.NotActivated ->
-            "Приложение не активировано. Введите лицензионный или пробный ключ."
-        LicenseStatus.LicenseExpired -> "Срок лицензии истёк. Введите новый ключ."
+            tr("Приложение не активировано. Введите лицензионный или пробный ключ.")
+        LicenseStatus.LicenseExpired -> tr("Срок лицензии истёк. Введите новый ключ.")
         LicenseStatus.ClockTampered ->
-            "Время на телефоне отстаёт от сетевого, ключ деактивирован. Включите автоматическое время, подключитесь к интернету и введите ключ заново."
+            tr("Время на телефоне отстаёт от сетевого, ключ деактивирован. Включите автоматическое время, подключитесь к интернету и введите ключ заново.")
     }
 }

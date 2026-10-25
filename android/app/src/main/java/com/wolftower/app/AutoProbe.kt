@@ -38,12 +38,12 @@ object AutoProbe {
     fun start(appCtx: Context, profiles: List<Profile>, strategies: List<String>) {
         if (state.value.running) return
         cancelled = false
-        state.value = ProbeState(running = true, progress = "Подготовка…")
+        state.value = ProbeState(running = true, progress = tr("Подготовка…"))
         thread(isDaemon = true) {
             try {
                 run(appCtx, profiles, strategies)
             } catch (t: Throwable) {
-                state.value = ProbeState(done = true, report = "Ошибка подбора: ${t.message}")
+                state.value = ProbeState(done = true, report = trf("Ошибка подбора: {0}", t.message))
             }
         }
     }
@@ -76,7 +76,7 @@ object AutoProbe {
                         ports[strategy] = port
                     }
                 }
-                if (procs.isEmpty()) throw IllegalStateException("не удалось запустить ByeDPI")
+                if (procs.isEmpty()) throw IllegalStateException(tr("не удалось запустить ByeDPI"))
                 ports.values.forEach { waitPort(it) }
 
                 val pool = Executors.newFixedThreadPool(12)
@@ -138,11 +138,11 @@ object AutoProbe {
     private fun run(ctx: Context, profiles: List<Profile>, strategies: List<String>) {
         val candidates = listOf("none") + strategies
         val okCounts = score(ctx, profiles, candidates, { cancelled }) { n ->
-            state.value = state.value.copy(progress = "Проверено вариантов: $n из ${candidates.size}")
+            state.value = state.value.copy(progress = trf("Проверено вариантов: {0} из {1}", n, candidates.size))
         }
 
         if (cancelled) {
-            state.value = ProbeState(done = true, report = "Подбор отменён, настройки не менялись")
+            state.value = ProbeState(done = true, report = tr("Подбор отменён, настройки не менялись"))
             return
         }
 
@@ -151,7 +151,7 @@ object AutoProbe {
         for (profile in profiles) {
             val total = profile.probeHosts.size
             if (total == 0) {
-                lines.add("${profile.name}: нет адресов для проверки")
+                lines.add(trf("{0}: нет адресов для проверки", profile.name))
                 continue
             }
             val counts = okCounts.getValue(profile.id)
@@ -168,14 +168,14 @@ object AutoProbe {
                 }
             }
             if (best == null) {
-                state.value = state.value.copy(progress = "Диагностика: ${profile.name}…")
+                state.value = state.value.copy(progress = trf("Диагностика: {0}…", profile.name))
                 val host = profile.probeHosts.first()
-                lines.add("${profile.name}: ничего не сработало (0/$total).\n   Диагностика $host: ${Diagnose.verdict(host)}")
+                lines.add(trf("{0}: ничего не сработало (0/{1}).\n   Диагностика {2}: {3}", profile.name, total, host, Diagnose.verdict(host)))
             } else {
                 Settings.setStrategyFor(ctx, profile.id, best)
                 scores[profile.id] = "$bestOk/$total"
-                val label = if (best == "none") "обход не нужен" else best
-                lines.add("${profile.name}: $label ($bestOk/$total)")
+                val label = if (best == "none") tr("обход не нужен") else best
+                lines.add(trf("{0}: {1} ({2}/{3})", profile.name, label, bestOk, total))
             }
         }
         state.value = ProbeState(done = true, report = lines.joinToString("\n"), scores = scores)

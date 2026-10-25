@@ -1,0 +1,550 @@
+{
+ "Разблокировка YouTube и Instagram": {
+  "en": "Unblock YouTube and Instagram",
+  "ce": "YouTube а, Instagram а блокировка дӏаяккхар"
+ },
+ "Защита включена": {
+  "en": "Protection is on",
+  "ce": "Ларар болх беш ду"
+ },
+ "Защита выключена": {
+  "en": "Protection is off",
+  "ce": "Ларар сацийна"
+ },
+ "Подбор стратегии…": {
+  "en": "Choosing a strategy…",
+  "ce": "Стратеги харжар…"
+ },
+ "Проверка лицензии…": {
+  "en": "Checking the license…",
+  "ce": "Лицензи таллар…"
+ },
+ "{0} идёт через обход. Сеть: {1}": {
+  "en": "{0} is going through the bypass. Network: {1}",
+  "ce": "{0}: обход болх беш бу. Сеть: {1}"
+ },
+ "{0} идут через обход. Сеть: {1}": {
+  "en": "{0} are going through the bypass. Network: {1}",
+  "ce": "{0}: обход болх беш бу. Сеть: {1}"
+ },
+ "{0} идёт через обход": {
+  "en": "{0} is going through the bypass",
+  "ce": "{0}: обход болх беш бу"
+ },
+ "{0} идут через обход": {
+  "en": "{0} are going through the bypass",
+  "ce": "{0}: обход болх беш бу"
+ },
+ "Для запуска введите лицензионный ключ": {
+  "en": "Enter a license key to start",
+  "ce": "Дӏаболо лицензионни ключ яздан"
+ },
+ "Включите хотя бы один сервис ниже": {
+  "en": "Turn on at least one service below",
+  "ce": "Лахахь цхьа сервис хьалаайбе"
+ },
+ "Нажмите кнопку, чтобы разблокировать {0}": {
+  "en": "Press the button to unblock {0}",
+  "ce": "Кнопка тӏетаӏа: {0} блокировка дӏаяккха"
+ },
+ " и ": {
+  "en": " and ",
+  "ce": ", "
+ },
+ "Сервисы": {
+  "en": "Services",
+  "ce": "Сервисаш"
+ },
+ " (проверка: {0})": {
+  "en": " (check: {0})",
+  "ce": " (таллар: {0})"
+ },
+ "Стратегия: ": {
+  "en": "Strategy: ",
+  "ce": "Стратеги: "
+ },
+ "без обхода": {
+  "en": "no bypass",
+  "ce": "обход йоцуш"
+ },
+ "своя строка": {
+  "en": "custom string",
+  "ce": "шен строка"
+ },
+ "Чтобы изменить набор сервисов, сначала остановите защиту.": {
+  "en": "To change the set of services, stop the protection first.",
+  "ce": "Сервисаш хийца, хьалха ларар саца."
+ },
+ "Ключ принят": {
+  "en": "Key accepted",
+  "ce": "Ключ дӏаэцна"
+ },
+ "Пробная лицензия": {
+  "en": "Trial license",
+  "ce": "Тест лицензи"
+ },
+ "Лицензия активна": {
+  "en": "License active",
+  "ce": "Лицензи болх беш бу"
+ },
+ "Осталось {0}": {
+  "en": "{0} left",
+  "ce": "Дисина: {0}"
+ },
+ "Бессрочная": {
+  "en": "No expiry",
+  "ce": "Хан йоцуш"
+ },
+ "Активация": {
+  "en": "Activation",
+  "ce": "Активаци"
+ },
+ "ID устройства (нужен для ключа с привязкой)": {
+  "en": "Device ID (needed for a device-bound key)",
+  "ce": "Гӏирсан ID (гӏирсаца бӏогӏам болчу ключана оьшу)"
+ },
+ "Копировать ID": {
+  "en": "Copy ID",
+  "ce": "ID копи дан"
+ },
+ "Скопировано": {
+  "en": "Copied",
+  "ce": "Копи дина"
+ },
+ "Поделиться": {
+  "en": "Share",
+  "ce": "Дӏадахьийта"
+ },
+ "ID устройства Wolf Tower: {0}": {
+  "en": "Wolf Tower device ID: {0}",
+  "ce": "Wolf Tower гӏирсан ID: {0}"
+ },
+ "Отправить ID": {
+  "en": "Send ID",
+  "ce": "ID дӏадахьийта"
+ },
+ "Лицензионный ключ": {
+  "en": "License key",
+  "ce": "Лицензионни ключ"
+ },
+ "Проверка…": {
+  "en": "Checking…",
+  "ce": "Таллар…"
+ },
+ "Активировать": {
+  "en": "Activate",
+  "ce": "Активаци дан"
+ },
+ "Вставить": {
+  "en": "Paste",
+  "ce": "Чу дилла"
+ },
+ "Отмена": {
+  "en": "Cancel",
+  "ce": "Отмена"
+ },
+ "Ввести другой ключ": {
+  "en": "Enter another key",
+  "ce": "Вукх ключ яздан"
+ },
+ "Последний сбой (можно скопировать и прислать)": {
+  "en": "Last crash (you can copy and send it)",
+  "ce": "Тӏаьххьара ошибка (копи дой, дӏадахьийта мегар ду)"
+ },
+ "Скрыть": {
+  "en": "Hide",
+  "ce": "Къайладаккха"
+ },
+ "Стратегия обхода": {
+  "en": "Bypass strategy",
+  "ce": "Обходан стратеги"
+ },
+ "Для каждого сервиса подбирается свой вариант. Проверка YouTube учитывает и скорость: замедление, при котором страница открывается, но медленно, не засчитывается как успех.": {
+  "en": "A separate option is chosen for each service. The YouTube check also looks at speed: throttling, where the page opens but slowly, does not count as success.",
+  "ce": "Сервис хӏора шен вариант харжало. YouTube таллар чехкаллин а ларло: аьтто бу страница схьаелла, амма меттаха делахь, и кхиам бац."
+ },
+ "Подобрать автоматически": {
+  "en": "Choose automatically",
+  "ce": "Автоматически харжа"
+ },
+ "Защита работает: приложение само проверяет доступность и временно меняет стратегию, если сервис перестаёт открываться. Для ручного подбора сначала остановите защиту.": {
+  "en": "Protection is running: the app checks availability itself and temporarily switches strategy if a service stops opening. To choose manually, stop the protection first.",
+  "ce": "Ларар болх беш ду: приложени шен-шена таллар до, сервис схьаелла ца даллахь, стратеги кӏеззиг хийцало. Куьйгаца харжа, хьалха ларар саца."
+ },
+ "Результат подбора": {
+  "en": "Selection result",
+  "ce": "Харжаран жамӏ"
+ },
+ "Подготовка…": {
+  "en": "Preparing…",
+  "ce": "Кечдар…"
+ },
+ "Ошибка подбора: {0}": {
+  "en": "Selection error: {0}",
+  "ce": "Харжарехь ошибка: {0}"
+ },
+ "Проверено вариантов: {0} из {1}": {
+  "en": "Options checked: {0} of {1}",
+  "ce": "Таллийна варианташ: {0} {1} чохь"
+ },
+ "Подбор отменён, настройки не менялись": {
+  "en": "Selection cancelled, settings unchanged",
+  "ce": "Харжар сацийна, нисдарш ца хийцна"
+ },
+ "{0}: нет адресов для проверки": {
+  "en": "{0}: no addresses to check",
+  "ce": "{0}: таллар дан адресаш яц"
+ },
+ "Диагностика: {0}…": {
+  "en": "Diagnostics: {0}…",
+  "ce": "Диагностика: {0}…"
+ },
+ "{0}: ничего не сработало (0/{1}).\n   Диагностика {2}: {3}": {
+  "en": "{0}: nothing worked (0/{1}).\n   Diagnostics {2}: {3}",
+  "ce": "{0}: цхьаъ а ца болхбелира (0/{1}).\n   Диагностика {2}: {3}"
+ },
+ "{0}: ничего не сработало (0/{1}). Возможна блокировка по IP или подмена DNS.": {
+  "en": "{0}: nothing worked (0/{1}). Possible IP block or DNS spoofing.",
+  "ce": "{0}: цхьаъ а ца болхбелира (0/{1}). IP-ца блокировка я DNS хийцам хила тарло."
+ },
+ "обход не нужен": {
+  "en": "no bypass needed",
+  "ce": "обход ца оьшу"
+ },
+ "{0}: {1} ({2}/{3})": {
+  "en": "{0}: {1} ({2}/{3})",
+  "ce": "{0}: {1} ({2}/{3})"
+ },
+ "не удалось запустить ByeDPI": {
+  "en": "could not start ByeDPI",
+  "ce": "ByeDPI дӏаболо ца даьлла"
+ },
+ "адрес не определился ни через DNS телефона, ни через DoH (возможно, нет сети или заблокированы оба)": {
+  "en": "the address could not be resolved via the phone's DNS or via DoH (maybe no network, or both are blocked)",
+  "ce": "адрес телефонан DNS-ехь а, DoH-ехь а ца карийна (сеть яц я шиъ а блокировка йина)"
+ },
+ "DNS телефона не отвечает на это имя, а через DoH адрес есть ({0}): DNS оператора блокирует имя": {
+  "en": "the phone's DNS does not answer for this name, but DoH returns an address ({0}): the operator's DNS blocks the name",
+  "ce": "телефонан DNS и цӏе жоп ца ло, DoH-ехь адрес ю ({0}): операторан DNS цӏе блокировка до"
+ },
+ "адреса DNS телефона ({0}) и DoH ({1}) не совпадают, возможна подмена DNS (но у CDN это бывает и в норме). ": {
+  "en": "the phone's DNS ({0}) and DoH ({1}) addresses differ, DNS spoofing is possible (though this is normal for CDNs). ",
+  "ce": "телефонан DNS ({0}) а, DoH ({1}) а адресаш цхьатера дац, DNS хийцам хила тарло (CDN-ашна и цуьнан нийса а ду). "
+ },
+ "TCP до {0}:443 не устанавливается (таймаут или отказ): похоже на блокировку по IP. ByeDPI такое не обходит, нужен прокси/VPN вне сети оператора": {
+  "en": "TCP to {0}:443 cannot be established (timeout or refusal): looks like an IP block. ByeDPI cannot bypass that, a proxy/VPN outside the operator's network is needed",
+  "ce": "TCP {0}:443 тӏе ца хуьлу (хан чекх я юхахӏиттор): IP-ца блокировка санна ю. ByeDPI и ца йоккху, операторан сетега арахь прокси/VPN оьшу"
+ },
+ "напрямую всё открывается, проблема, вероятно, в самом тесте или временная": {
+  "en": "everything opens directly; the problem is probably in the test itself or temporary",
+  "ce": "ширхьа ерриг схьаелла, дарба тестехь я кӏеззиг хан ю"
+ },
+ "TLS отвечает, но сертификат не подходит: на пути подставной сервер (подмена DNS или перехват)": {
+  "en": "TLS answers, but the certificate does not match: there is a fake server on the path (DNS spoofing or interception)",
+  "ce": "TLS жоп ло, амма сертификат ца дӏахӏуьту: новкъахь харц сервер ю (DNS хийцам я дӏаэцар)"
+ },
+ "TCP до {0} есть, но TLS с этим именем обрывается: блокировка по SNI/содержимому, а обход не помог": {
+  "en": "TCP to {0} works, but TLS with this name is cut off: blocking by SNI/content, and the bypass did not help",
+  "ce": "TCP {0} тӏе ю, амма и цӏеца TLS дӏадоьрзу: SNI/чулацамца блокировка, обход ца болхбелира"
+ },
+ "Работа в фоне": {
+  "en": "Background operation",
+  "ce": "Фонехь болх бар"
+ },
+ "Чтобы система не отключала защиту, разрешите приложению работать без ограничений батареи. На Xiaomi, Huawei, Samsung и других дополнительно включите автозапуск и снимите ограничения фона в настройках приложения.": {
+  "en": "So the system does not switch the protection off, allow the app to run without battery restrictions. On Xiaomi, Huawei, Samsung and others, also enable autostart and remove background limits in the app settings.",
+  "ce": "Система ларар ма дӏаяккха, приложенига батареян чекхдалар йоцуш болх бан бакъо делахь. Xiaomi, Huawei, Samsung а, кхерчара а чохь автозапуск хьалаайбе, приложенин нисдаршехь фонан чеккхаш дӏаяккха."
+ },
+ "Разрешить": {
+  "en": "Allow",
+  "ce": "Бакъо дала"
+ },
+ "Настройки": {
+  "en": "Settings",
+  "ce": "Нисдарш"
+ },
+ "Язык": {
+  "en": "Language",
+  "ce": "Мотт"
+ },
+ "Дополнительно": {
+  "en": "Advanced",
+  "ce": "Кхин а"
+ },
+ "Выбрать стратегию вручную": {
+  "en": "Choose a strategy manually",
+  "ce": "Стратеги куьйгаца харжа"
+ },
+ "Своя строка (формат ByeByeDPI), например: -d1 -s1+s -s3+s -a1": {
+  "en": "Custom string (ByeByeDPI format), e.g.: -d1 -s1+s -s3+s -a1",
+  "ce": "Шен строка (ByeByeDPI формат), масала: -d1 -s1+s -s3+s -a1"
+ },
+ "Своя строка (формат ByeByeDPI), например: -s1+s -d3+s -r1+s": {
+  "en": "Custom string (ByeByeDPI format), e.g.: -s1+s -d3+s -r1+s",
+  "ce": "Шен строка (ByeByeDPI формат), масала: -s1+s -d3+s -r1+s"
+ },
+ "Аргументы обхода": {
+  "en": "Bypass arguments",
+  "ce": "Обходан аргументаш"
+ },
+ "Применить": {
+  "en": "Apply",
+  "ce": "Лело"
+ },
+ "Допустимы только флаги обхода: -s -d -o -q -f -t -r -a и т.п.": {
+  "en": "Only bypass flags are allowed: -s -d -o -q -f -t -r -a etc.",
+  "ce": "Обходан флагаш бен мегар ду: -s -d -o -q -f -t -r -a а, кхин а."
+ },
+ "Защищённый DNS (DoH)": {
+  "en": "Secure DNS (DoH)",
+  "ce": "Ларъинчу DNS (DoH)"
+ },
+ "Экспериментально. Помогает, если DNS оператора подменяет ответы, но отключает UDP: звонки в Instagram работать не будут. Видео YouTube и ленты идут по TCP и не страдают.": {
+  "en": "Experimental. Helps if the operator's DNS spoofs answers, but disables UDP: Instagram calls will not work. YouTube video and feeds use TCP and are not affected.",
+  "ce": "Экспериментални. Операторан DNS жамӏаш хийцахь гӏо до, амма UDP дӏаяьккхина: Instagram чӏагӏам болх ца бийр бу. YouTube видео а, лентанаш а TCP-ца хуьлу, церан хало яц."
+ },
+ "Лог ({0})": {
+  "en": "Log ({0})",
+  "ce": "Журнал ({0})"
+ },
+ "Лог": {
+  "en": "Log",
+  "ce": "Журнал"
+ },
+ "Пока пусто": {
+  "en": "Nothing yet",
+  "ce": "Хӏинца даьсса ду"
+ },
+ "Копировать лог": {
+  "en": "Copy log",
+  "ce": "Журнал копи дан"
+ },
+ "Очистить": {
+  "en": "Clear",
+  "ce": "Цӏанйан"
+ },
+ "Свернуть": {
+  "en": "Collapse",
+  "ce": "Къайладаккха"
+ },
+ "Развернуть": {
+  "en": "Expand",
+  "ce": "Гайта"
+ },
+ "Отправить диагностику": {
+  "en": "Send diagnostics",
+  "ce": "Диагностика дӏадахьийта"
+ },
+ "Скопировать диагностику": {
+  "en": "Copy diagnostics",
+  "ce": "Диагностика копи дан"
+ },
+ "Wolf Tower: диагностика": {
+  "en": "Wolf Tower: diagnostics",
+  "ce": "Wolf Tower: диагностика"
+ },
+ "В отчёт попадают версия Android, модель, тип сети и оператор, выбранная стратегия и лог. IP-адреса, трафик и сам ключ не включаются.": {
+  "en": "The report includes the Android version, model, network type and operator, the chosen strategy and the log. IP addresses, traffic and the key itself are not included.",
+  "ce": "Отчётехь Android версий, модель, сетан тайп а, оператор а, харжийна стратеги а, журнал а чуйогӏу. IP-адресаш, трафик, ключ шех а чуйоцу."
+ },
+ "В отчёт не попадают IP-адреса, трафик и сам ключ.": {
+  "en": "IP addresses, traffic and the key itself are not included in the report.",
+  "ce": "Отчётехь IP-адресаш, трафик, ключ шех а ца чуйогӏу."
+ },
+ "Скрыть лицензии компонентов": {
+  "en": "Hide component licenses",
+  "ce": "Компонентийн лицензеш къайладаккха"
+ },
+ "Лицензии компонентов": {
+  "en": "Component licenses",
+  "ce": "Компонентийн лицензеш"
+ },
+ "Не удалось прочитать файл лицензий": {
+  "en": "Could not read the license file",
+  "ce": "Лицензеш йолу файл ӏаламаш ца даьлла"
+ },
+ "Включить или выключить защиту": {
+  "en": "Turn protection on or off",
+  "ce": "Ларар хьалаайбе я сацае"
+ },
+ "Нужен лицензионный ключ": {
+  "en": "A license key is required",
+  "ce": "Лицензионни ключ оьшу"
+ },
+ "Не выбран ни один сервис": {
+  "en": "No service selected",
+  "ce": "Цхьа сервис а ца харжина"
+ },
+ "ByeDPI не запустился": {
+  "en": "ByeDPI did not start",
+  "ce": "ByeDPI дӏа ца болабелира"
+ },
+ "DoH-прокси не запустился": {
+  "en": "The DoH proxy did not start",
+  "ce": "DoH-прокси дӏа ца болабелира"
+ },
+ "Не удалось создать VPN-интерфейс": {
+  "en": "Could not create the VPN interface",
+  "ce": "VPN-интерфейс кхолла ца даьлла"
+ },
+ "Туннель не запустился": {
+  "en": "The tunnel did not start",
+  "ce": "Туннель дӏа ца болабелира"
+ },
+ "Защита": {
+  "en": "Protection",
+  "ce": "Ларар"
+ },
+ "Остановить": {
+  "en": "Stop",
+  "ce": "Саца"
+ },
+ "Время отстаёт от сетевого, ключ деактивирован": {
+  "en": "The clock is behind network time, the key has been deactivated",
+  "ce": "Хан сетан хенах юха ду, ключ дӏаяьккхина"
+ },
+ "Неверный формат ключа": {
+  "en": "Invalid key format",
+  "ce": "Ключан формат нийса дац"
+ },
+ "В приложении не задан публичный ключ лицензий": {
+  "en": "The app has no license public key",
+  "ce": "Приложенехь лицензийн публичи ключ ца дӏаяздина"
+ },
+ "Ключ не прошёл проверку подписи": {
+  "en": "The key failed signature verification",
+  "ce": "Ключ кехатмар талларехь ца даьлла"
+ },
+ "Ключ выпущен для другого устройства": {
+  "en": "The key was issued for another device",
+  "ce": "Ключ вукху гӏирсана арадаьккхина"
+ },
+ "Время на телефоне отстаёт от сетевого. Включите автоматическое время и повторите.": {
+  "en": "The phone's clock is behind network time. Turn on automatic time and try again.",
+  "ce": "Телефонан хан сетан хенах юха ду. Автоматически хан хьалаайбе, юха а гӏо."
+ },
+ "Время на компьютере отстаёт от сетевого. Включите автоматическое время и повторите.": {
+  "en": "The computer's clock is behind network time. Turn on automatic time and try again.",
+  "ce": "Компьютеран хан сетан хенах юха ду. Автоматически хан хьалаайбе, юха а гӏо."
+ },
+ "Нужен интернет, чтобы проверить время после прошлого нарушения.": {
+  "en": "An internet connection is needed to check the time after the earlier violation.",
+  "ce": "Хьалха хилла цатемам хан талла интернет оьшу."
+ },
+ "Срок действия этого ключа уже истёк": {
+  "en": "This key has already expired",
+  "ce": "Ишттачу ключан хан чекхъяьлла"
+ },
+ "{0} (бессрочная)": {
+  "en": "{0} (no expiry)",
+  "ce": "{0} (хан йоцуш)"
+ },
+ "{0} до {1}": {
+  "en": "{0} until {1}",
+  "ce": "{0} {1} кхаччалца"
+ },
+ "Приложение не активировано. Введите лицензионный или пробный ключ.": {
+  "en": "The app is not activated. Enter a license or trial key.",
+  "ce": "Приложени активаци ца дина. Лицензионни я тест ключ яздан."
+ },
+ "Срок лицензии истёк. Введите новый ключ.": {
+  "en": "The license has expired. Enter a new key.",
+  "ce": "Лицензин хан чекхъяьлла. Керла ключ яздан."
+ },
+ "Время на телефоне отстаёт от сетевого, ключ деактивирован. Включите автоматическое время, подключитесь к интернету и введите ключ заново.": {
+  "en": "The phone's clock is behind network time, the key was deactivated. Turn on automatic time, connect to the internet and enter the key again.",
+  "ce": "Телефонан хан сетан хенах юха ду, ключ дӏаяьккхина. Автоматически хан хьалаайбе, интернет тӏе юкъаметта, ключ юха яздан."
+ },
+ "Время на компьютере отстаёт от сетевого, ключ деактивирован. Включите автоматическое время, подключитесь к интернету и введите ключ заново.": {
+  "en": "The computer's clock is behind network time, the key was deactivated. Turn on automatic time, connect to the internet and enter the key again.",
+  "ce": "Компьютеран хан сетан хенах юха ду, ключ дӏаяьккхина. Автоматически хан хьалаайбе, интернет тӏе юкъаметта, ключ юха яздан."
+ },
+ "день": {
+  "en": "day",
+  "ce": "де"
+ },
+ "дня": {
+  "en": "days",
+  "ce": "де"
+ },
+ "дней": {
+  "en": "days",
+  "ce": "де"
+ },
+ "час": {
+  "en": "hour",
+  "ce": "сахьт"
+ },
+ "часа": {
+  "en": "hours",
+  "ce": "сахьт"
+ },
+ "часов": {
+  "en": "hours",
+  "ce": "сахьт"
+ },
+ "Мобильная сеть": {
+  "en": "Mobile network",
+  "ce": "Мобильни сеть"
+ },
+ "Мобильная сеть ({0})": {
+  "en": "Mobile network ({0})",
+  "ce": "Мобильни сеть ({0})"
+ },
+ "Другая сеть": {
+  "en": "Other network",
+  "ce": "Кхин сеть"
+ },
+ "Нет сети": {
+  "en": "No network",
+  "ce": "Сеть яц"
+ },
+ "Неизвестно": {
+  "en": "Unknown",
+  "ce": "Девзаш доцуш"
+ },
+ "Открыть Wolf Tower": {
+  "en": "Open Wolf Tower",
+  "ce": "Wolf Tower схьаелла"
+ },
+ "Выключить защиту": {
+  "en": "Turn protection off",
+  "ce": "Ларар сацае"
+ },
+ "Включить защиту": {
+  "en": "Turn protection on",
+  "ce": "Ларар хьалаайбе"
+ },
+ "Выход": {
+  "en": "Quit",
+  "ce": "Арадовла"
+ },
+ "Wolf Tower: защита включена": {
+  "en": "Wolf Tower: protection is on",
+  "ce": "Wolf Tower: ларар болх беш ду"
+ },
+ "Wolf Tower: защита выключена": {
+  "en": "Wolf Tower: protection is off",
+  "ce": "Wolf Tower: ларар сацийна"
+ },
+ "Не удалось вернуть прежние настройки прокси: ": {
+  "en": "Could not restore the previous proxy settings: ",
+  "ce": "Хьалхара прокси нисдарш юхаметтаяккха ца даьлла: "
+ },
+ "Что покрывает версия для компьютера.": {
+  "en": "What the desktop version covers.",
+  "ce": "Компьютеран версино хӏун ларъо."
+ },
+ "Через защиту идёт YouTube и Instagram в браузерах и в других программах, которые используют системные настройки прокси. QUIC (HTTP/3) через прокси не используется, браузер переходит на TCP, где приёмы обхода работают.": {
+  "en": "YouTube and Instagram go through the protection in browsers and in other programs that use the system proxy settings. QUIC (HTTP/3) is not used through the proxy, the browser falls back to TCP, where the bypass techniques work.",
+  "ce": "YouTube а, Instagram а браузерашкахь а, системин прокси нисдарш лелош долу кхин программашкахь а ларарехула дӏадоьлху. QUIC (HTTP/3) проксица ца лелало, браузер TCP тӏе дерзало, цигахь обходан кепаш болх беш бу."
+ },
+ "При первом включении защиты macOS попросит пароль администратора для настройки прокси.": {
+  "en": "The first time you turn protection on, macOS will ask for the administrator password to set up the proxy.",
+  "ce": "Ларар хьалхара хьалаайбича macOS-ан администраторан пароль некъа, прокси нисдан."
+ },
+ "Приложения из Microsoft Store системный прокси могут не учитывать: используйте YouTube и Instagram в браузере.": {
+  "en": "Apps from the Microsoft Store may ignore the system proxy: use YouTube and Instagram in a browser.",
+  "ce": "Microsoft Store приложенеша системин прокси ца ларо мегара ду: YouTube а, Instagram а браузерехь лела."
+ }
+}

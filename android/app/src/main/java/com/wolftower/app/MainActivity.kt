@@ -62,8 +62,8 @@ import kotlinx.coroutines.delay
 import kotlin.concurrent.thread
 
 private fun strategyLabel(s: String): String = when {
-    s == "none" -> "без обхода"
-    s.startsWith(StrategyArgs.RAW_PREFIX) -> "своя строка"
+    s == "none" -> tr("без обхода")
+    s.startsWith(StrategyArgs.RAW_PREFIX) -> tr("своя строка")
     else -> s
 }
 
@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
         val tick = resumeTick.value
         val canRun = status.canRun
         val chosenProfiles = profiles.filter { it.id in enabled }
-        val chosenNames = chosenProfiles.joinToString(" и ") { it.name }
+        val chosenNames = chosenProfiles.joinToString(tr(" и ")) { it.name }
         val licensed = status as? LicenseStatus.Licensed
         val deviceId = remember { LicenseManager.deviceId(ctx) }
 
@@ -189,7 +189,19 @@ class MainActivity : ComponentActivity() {
                         )
                         Column {
                             Text("Wolf Tower", color = WT.Text, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                            Text("Разблокировка YouTube и Instagram", color = WT.TextDim, fontSize = 13.sp)
+                            Text(tr("Разблокировка YouTube и Instagram"), color = WT.TextDim, fontSize = 13.sp)
+                        }
+                    }
+
+                    // ---------- Язык ----------
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        I18n.LANGS.forEach { (code, name) ->
+                            WtChip(
+                                text = name,
+                                selected = I18n.lang == code,
+                                enabled = true,
+                                onClick = { I18n.set(ctx, code) },
+                            )
                         }
                     }
 
@@ -222,10 +234,10 @@ class MainActivity : ComponentActivity() {
                         )
                         Text(
                             when {
-                                running -> "Защита включена"
-                                probe.running -> "Подбор стратегии…"
-                                busy -> "Проверка лицензии…"
-                                else -> "Защита выключена"
+                                running -> tr("Защита включена")
+                                probe.running -> tr("Подбор стратегии…")
+                                busy -> tr("Проверка лицензии…")
+                                else -> tr("Защита выключена")
                             },
                             color = if (running) WT.AccentGlow else WT.Text,
                             fontSize = 22.sp,
@@ -234,10 +246,13 @@ class MainActivity : ComponentActivity() {
                         Spacer(Modifier.size(4.dp))
                         Text(
                             when {
-                                running -> "$chosenNames ${if (chosenProfiles.size == 1) "идёт" else "идут"} через обход. Сеть: $netName"
-                                !canRun -> "Для запуска введите лицензионный ключ"
-                                chosenProfiles.isEmpty() -> "Включите хотя бы один сервис ниже"
-                                else -> "Нажмите кнопку, чтобы разблокировать $chosenNames"
+                                running -> trf(
+                                    if (chosenProfiles.size == 1) "{0} идёт через обход. Сеть: {1}" else "{0} идут через обход. Сеть: {1}",
+                                    chosenNames, netName,
+                                )
+                                !canRun -> tr("Для запуска введите лицензионный ключ")
+                                chosenProfiles.isEmpty() -> tr("Включите хотя бы один сервис ниже")
+                                else -> trf("Нажмите кнопку, чтобы разблокировать {0}", chosenNames)
                             },
                             color = if (!running && (!canRun || chosenProfiles.isEmpty())) WT.Amber else WT.TextDim,
                             fontSize = 13.sp,
@@ -246,13 +261,13 @@ class MainActivity : ComponentActivity() {
 
                     // ---------- Сервисы ----------
                     WtCard {
-                        Text("Сервисы", color = WT.Text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                        Text(tr("Сервисы"), color = WT.Text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                         profiles.forEach { p ->
-                            val score = probe.scores[p.id]?.let { " (проверка: $it)" } ?: ""
+                            val score = probe.scores[p.id]?.let { trf(" (проверка: {0})", it) } ?: ""
                             ServiceRow(
                                 id = p.id,
                                 name = p.name,
-                                subtitle = "Стратегия: " + strategyLabel(strategies[p.id] ?: config.defaultStrategy) + score,
+                                subtitle = tr("Стратегия: ") + strategyLabel(strategies[p.id] ?: config.defaultStrategy) + score,
                                 checked = p.id in enabled,
                                 enabled = !running,
                                 onChange = { on ->
@@ -262,7 +277,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         if (running) {
-                            Text("Чтобы изменить набор сервисов, сначала остановите защиту.", color = WT.TextDim, fontSize = 12.sp)
+                            Text(tr("Чтобы изменить набор сервисов, сначала остановите защиту."), color = WT.TextDim, fontSize = 12.sp)
                         }
                     }
 
@@ -283,16 +298,16 @@ class MainActivity : ComponentActivity() {
                             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 Text(
                                     when {
-                                        justActivated -> "Ключ принят"
-                                        licensed.plan == "trial" -> "Пробная лицензия"
-                                        else -> "Лицензия активна"
+                                        justActivated -> tr("Ключ принят")
+                                        licensed.plan == "trial" -> tr("Пробная лицензия")
+                                        else -> tr("Лицензия активна")
                                     },
                                     color = WT.Text,
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 15.sp,
                                 )
                                 Text(
-                                    if (left != null) "Осталось $left" else "Бессрочная",
+                                    if (left != null) trf("Осталось {0}", left) else tr("Бессрочная"),
                                     color = if (soon) WT.Amber else WT.TextDim,
                                     fontSize = 13.sp,
                                 )
@@ -300,11 +315,11 @@ class MainActivity : ComponentActivity() {
                         }
                     } else {
                         WtCard {
-                            Text("Активация", color = WT.Text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                            Text(tr("Активация"), color = WT.Text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                             if (licensed == null) {
                                 Text(LicenseManager.describe(status), color = WT.TextDim, fontSize = 13.sp)
                             }
-                            Text("ID устройства (нужен для ключа с привязкой)", color = WT.TextDim, fontSize = 12.sp)
+                            Text(tr("ID устройства (нужен для ключа с привязкой)"), color = WT.TextDim, fontSize = 12.sp)
                             Box(
                                 Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(WT.SurfaceHigh).padding(14.dp)
                             ) {
@@ -321,21 +336,21 @@ class MainActivity : ComponentActivity() {
                             }
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 CopyPill(
-                                    label = "Копировать ID",
-                                    doneLabel = "Скопировано",
+                                    label = tr("Копировать ID"),
+                                    doneLabel = tr("Скопировано"),
                                     onCopy = { clipboard.setText(AnnotatedString(deviceId)) },
                                 )
-                                SharePill(label = "Поделиться", onClick = {
+                                SharePill(label = tr("Поделиться"), onClick = {
                                     val send = Intent(Intent.ACTION_SEND)
                                         .setType("text/plain")
-                                        .putExtra(Intent.EXTRA_TEXT, "ID устройства Wolf Tower: $deviceId")
-                                    startActivity(Intent.createChooser(send, "Отправить ID"))
+                                        .putExtra(Intent.EXTRA_TEXT, trf("ID устройства Wolf Tower: {0}", deviceId))
+                                    startActivity(Intent.createChooser(send, tr("Отправить ID")))
                                 })
                             }
-                            WtTextField(value = keyInput, onValueChange = { keyInput = it }, label = "Лицензионный ключ")
+                            WtTextField(value = keyInput, onValueChange = { keyInput = it }, label = tr("Лицензионный ключ"))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 WtButton(
-                                    text = if (busy) "Проверка…" else "Активировать",
+                                    text = if (busy) tr("Проверка…") else tr("Активировать"),
                                     enabled = keyInput.isNotBlank() && !busy,
                                     onClick = {
                                         busy = true
@@ -356,12 +371,12 @@ class MainActivity : ComponentActivity() {
                                     },
                                 )
                                 WtButton(
-                                    text = "Вставить",
+                                    text = tr("Вставить"),
                                     primary = false,
                                     onClick = { clipboard.getText()?.text?.let { keyInput = it.trim() } },
                                 )
                                 if (licensed != null) {
-                                    WtButton(text = "Отмена", primary = false, onClick = {
+                                    WtButton(text = tr("Отмена"), primary = false, onClick = {
                                         changingKey = false
                                         licenseMsg = null
                                     })
@@ -374,9 +389,9 @@ class MainActivity : ComponentActivity() {
                     // ---------- Сбой прошлого запуска ----------
                     if (crash != null) {
                         WtCard {
-                            Text("Последний сбой (можно скопировать и прислать)", color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                            Text(tr("Последний сбой (можно скопировать и прислать)"), color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 14.sp)
                             SelectionContainer { Text(crash ?: "", color = WT.TextDim, fontSize = 12.sp) }
-                            WtButton(text = "Скрыть", primary = false, onClick = {
+                            WtButton(text = tr("Скрыть"), primary = false, onClick = {
                                 CrashInfo.dismiss(ctx)
                                 crash = null
                             })
@@ -385,15 +400,14 @@ class MainActivity : ComponentActivity() {
 
                     // ---------- Стратегия ----------
                     WtCard {
-                        Text("Стратегия обхода", color = WT.Text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                        Text(tr("Стратегия обхода"), color = WT.Text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                         Text(
-                            "Для каждого сервиса подбирается свой вариант. Проверка YouTube учитывает и скорость: " +
-                                "замедление, при котором страница открывается, но медленно, не засчитывается как успех.",
+                            tr("Для каждого сервиса подбирается свой вариант. Проверка YouTube учитывает и скорость: замедление, при котором страница открывается, но медленно, не засчитывается как успех."),
                             color = WT.TextDim,
                             fontSize = 12.sp,
                         )
                         WtButton(
-                            text = "Подобрать автоматически",
+                            text = tr("Подобрать автоматически"),
                             primary = false,
                             modifier = Modifier.fillMaxWidth(),
                             enabled = !running && !probe.running && canRun && chosenProfiles.isNotEmpty(),
@@ -401,8 +415,7 @@ class MainActivity : ComponentActivity() {
                         )
                         if (running) {
                             Text(
-                                "Защита работает: приложение само проверяет доступность и временно меняет стратегию, " +
-                                    "если сервис перестаёт открываться. Для ручного подбора сначала остановите защиту.",
+                                tr("Защита работает: приложение само проверяет доступность и временно меняет стратегию, если сервис перестаёт открываться. Для ручного подбора сначала остановите защиту."),
                                 color = WT.TextDim,
                                 fontSize = 12.sp,
                             )
@@ -410,10 +423,10 @@ class MainActivity : ComponentActivity() {
                         if (probe.running) {
                             LinearProgressIndicator(Modifier.fillMaxWidth(), color = WT.Accent, trackColor = WT.SurfaceHigh)
                             Text(probe.progress, color = WT.TextDim, fontSize = 12.sp)
-                            WtButton(text = "Отмена", primary = false, onClick = { AutoProbe.cancel() })
+                            WtButton(text = tr("Отмена"), primary = false, onClick = { AutoProbe.cancel() })
                         }
                         if (probe.report.isNotEmpty()) {
-                            Text("Результат подбора", color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                            Text(tr("Результат подбора"), color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 14.sp)
                             Text(probe.report, color = WT.TextDim, fontSize = 12.sp)
                         }
                     }
@@ -421,16 +434,14 @@ class MainActivity : ComponentActivity() {
                     // ---------- Работа в фоне ----------
                     if (!batteryOk) {
                         WtCard {
-                            Text("Работа в фоне", color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                            Text(tr("Работа в фоне"), color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
                             Text(
-                                "Чтобы система не отключала защиту, разрешите приложению работать без ограничений батареи. " +
-                                    "На Xiaomi, Huawei, Samsung и других дополнительно включите автозапуск и снимите " +
-                                    "ограничения фона в настройках приложения.",
+                                tr("Чтобы система не отключала защиту, разрешите приложению работать без ограничений батареи. На Xiaomi, Huawei, Samsung и других дополнительно включите автозапуск и снимите ограничения фона в настройках приложения."),
                                 color = WT.TextDim,
                                 fontSize = 13.sp,
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                WtButton(text = "Разрешить", onClick = {
+                                WtButton(text = tr("Разрешить"), onClick = {
                                     try {
                                         startActivity(
                                             Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
@@ -439,7 +450,7 @@ class MainActivity : ComponentActivity() {
                                     } catch (_: Exception) {
                                     }
                                 })
-                                WtButton(text = "Настройки", primary = false, onClick = {
+                                WtButton(text = tr("Настройки"), primary = false, onClick = {
                                     startActivity(
                                         Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                             .setData(Uri.parse("package:${ctx.packageName}"))
@@ -456,12 +467,12 @@ class MainActivity : ComponentActivity() {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Дополнительно", color = WT.TextDim, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                        Text(tr("Дополнительно"), color = WT.TextDim, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                         ChevronGlyph(WT.TextDim, 22.dp, advancedOpen)
                     }
                     if (advancedOpen) {
                         WtCard {
-                            Text("Выбрать стратегию вручную", color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                            Text(tr("Выбрать стратегию вручную"), color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
                             FlowRow(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -497,7 +508,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             Text(
-                                "Своя строка (формат ByeByeDPI), например: -d1 -s1+s -s3+s -a1",
+                                tr("Своя строка (формат ByeByeDPI), например: -d1 -s1+s -s3+s -a1"),
                                 color = WT.TextDim,
                                 fontSize = 12.sp,
                             )
@@ -507,16 +518,16 @@ class MainActivity : ComponentActivity() {
                                     rawInput = it
                                     rawError = null
                                 },
-                                label = "Аргументы обхода",
+                                label = tr("Аргументы обхода"),
                             )
                             rawError?.let { Text(it, color = WT.Amber, fontSize = 12.sp) }
                             WtButton(
-                                text = "Применить",
+                                text = tr("Применить"),
                                 primary = false,
                                 enabled = !running && rawInput.isNotBlank(),
                                 onClick = {
                                     if (StrategyArgs.parseRaw(rawInput) == null) {
-                                        rawError = "Допустимы только флаги обхода: -s -d -o -q -f -t -r -a и т.п."
+                                        rawError = tr("Допустимы только флаги обхода: -s -d -o -q -f -t -r -a и т.п.")
                                     } else {
                                         val value = StrategyArgs.RAW_PREFIX + rawInput.trim()
                                         Settings.setStrategyFor(ctx, advId, value)
@@ -528,8 +539,8 @@ class MainActivity : ComponentActivity() {
                         }
                         WtCard {
                             WtSwitchRow(
-                                title = "Защищённый DNS (DoH)",
-                                subtitle = "Экспериментально. Помогает, если DNS оператора подменяет ответы, но отключает UDP: звонки в Instagram работать не будут. Видео YouTube и ленты идут по TCP и не страдают.",
+                                title = tr("Защищённый DNS (DoH)"),
+                                subtitle = tr("Экспериментально. Помогает, если DNS оператора подменяет ответы, но отключает UDP: звонки в Instagram работать не будут. Видео YouTube и ленты идут по TCP и не страдают."),
                                 checked = dohOn,
                                 enabled = !running,
                                 onChange = {
@@ -544,12 +555,12 @@ class MainActivity : ComponentActivity() {
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text("Лог (${log.size})", color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                                Text(trf("Лог ({0})", log.size), color = WT.Text, fontWeight = FontWeight.Medium, fontSize = 15.sp)
                                 ChevronGlyph(WT.TextDim, 22.dp, logOpen)
                             }
                             if (!logOpen) {
                                 Text(
-                                    log.lastOrNull() ?: "Пока пусто",
+                                    log.lastOrNull() ?: tr("Пока пусто"),
                                     color = WT.TextDim,
                                     fontSize = 12.sp,
                                     maxLines = 1,
@@ -568,43 +579,42 @@ class MainActivity : ComponentActivity() {
                                 }
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     CopyPill(
-                                        label = "Копировать лог",
-                                        doneLabel = "Скопировано",
+                                        label = tr("Копировать лог"),
+                                        doneLabel = tr("Скопировано"),
                                         onCopy = { clipboard.setText(AnnotatedString(log.joinToString("\n"))) },
                                     )
-                                    WtButton(text = "Очистить", primary = false, onClick = { DpiVpnService.clearLog() })
+                                    WtButton(text = tr("Очистить"), primary = false, onClick = { DpiVpnService.clearLog() })
                                 }
                             }
                         }
                         WtCard {
                             if (licensed != null && !changingKey) {
                                 WtButton(
-                                    text = "Ввести другой ключ",
+                                    text = tr("Ввести другой ключ"),
                                     primary = false,
                                     modifier = Modifier.fillMaxWidth(),
                                     onClick = { changingKey = true },
                                 )
                             }
                             WtButton(
-                                text = "Отправить диагностику",
+                                text = tr("Отправить диагностику"),
                                 primary = false,
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
                                     val send = Intent(Intent.ACTION_SEND)
                                         .setType("text/plain")
-                                        .putExtra(Intent.EXTRA_SUBJECT, "Wolf Tower: диагностика")
+                                        .putExtra(Intent.EXTRA_SUBJECT, tr("Wolf Tower: диагностика"))
                                         .putExtra(Intent.EXTRA_TEXT, DiagReport.build(ctx, config))
-                                    startActivity(Intent.createChooser(send, "Отправить диагностику"))
+                                    startActivity(Intent.createChooser(send, tr("Отправить диагностику")))
                                 },
                             )
                             Text(
-                                "В отчёт попадают версия Android, модель, тип сети и оператор, выбранная стратегия и лог. " +
-                                    "IP-адреса, трафик и сам ключ не включаются.",
+                                tr("В отчёт попадают версия Android, модель, тип сети и оператор, выбранная стратегия и лог. IP-адреса, трафик и сам ключ не включаются."),
                                 color = WT.TextDim,
                                 fontSize = 12.sp,
                             )
                             WtButton(
-                                text = if (showLicenses) "Скрыть лицензии компонентов" else "Лицензии компонентов",
+                                text = if (showLicenses) tr("Скрыть лицензии компонентов") else tr("Лицензии компонентов"),
                                 primary = false,
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = { showLicenses = !showLicenses },
@@ -614,7 +624,7 @@ class MainActivity : ComponentActivity() {
                                     try {
                                         ctx.assets.open("third_party_licenses.txt").bufferedReader().use { it.readText() }
                                     } catch (_: Exception) {
-                                        "Не удалось прочитать файл лицензий"
+                                        tr("Не удалось прочитать файл лицензий")
                                     }
                                 }
                                 SelectionContainer { Text(text, color = WT.TextDim, fontSize = 12.sp) }

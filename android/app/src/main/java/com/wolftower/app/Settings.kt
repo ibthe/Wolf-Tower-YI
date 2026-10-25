@@ -6,6 +6,13 @@ import android.content.Context
 object Settings {
     private fun prefs(ctx: Context) = ctx.getSharedPreferences("dpi", Context.MODE_PRIVATE)
 
+    /** Выбранный язык интерфейса (ru, en, ce) или null, пока пользователь не выбирал: тогда берётся язык системы. */
+    fun language(ctx: Context): String? = prefs(ctx).getString("lang", null)
+
+    fun setLanguage(ctx: Context, code: String) {
+        prefs(ctx).edit().putString("lang", code).apply()
+    }
+
     private const val KEY_ENABLED = "enabled_services"
 
     /** Пока пользователь ничего не выбирал, включены оба сервиса. */

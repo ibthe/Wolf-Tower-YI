@@ -86,6 +86,84 @@ const config = loadConfig([path.join(root, 'profiles', 'profiles.json')]);
     assert.deepStrictEqual(enabledIds(config, st), []);
   });
 
+  await test('переводы: у каждого ключа есть английский и чеченский, подстановки совпадают', () => {
+    const dict = JSON.parse(fs.readFileSync(path.join(root, 'i18n', 'translations.json'), 'utf8'));
+    const ph = (t) => (t.match(/\{\d+\}/g) || []).sort().join();
+    for (const [k, v] of Object.entries(dict)) {
+      assert(v.en && v.ce, 'нет перевода: ' + k);
+      assert.strictEqual(ph(v.en), ph(k), 'подстановки en: ' + k);
+      assert.strictEqual(ph(v.ce), ph(k), 'подстановки ce: ' + k);
+    }
+    assert(Object.keys(dict).length > 100);
+  });
+
+  await test('переводы: все строки tr()/trf() из Android, компьютера и HTML есть в словаре', () => {
+    const dict = JSON.parse(fs.readFileSync(path.join(root, 'i18n', 'translations.json'), 'utf8'));
+    const files = [];
+    const walk = (d) => {
+      for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+        const full = path.join(d, f.name);
+        if (f.isDirectory()) { if (!['node_modules', 'dist', 'test', 'build'].includes(f.name)) walk(full); }
+        else if (/\.(kt|js|html)$/.test(f.name)) files.push(full);
+      }
+    };
+    walk(path.join(root, 'android', 'app', 'src', 'main', 'java'));
+    walk(path.join(root, 'desktop', 'renderer'));
+    walk(path.join(root, 'desktop', 'src'));
+    files.push(path.join(root, 'desktop', 'main.js'));
+    const unesc = (t) => t.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\'/g, "'");
+    const cyr = /[А-Яа-яЁё]/;
+    const missing = new Set();
+    let used = 0;
+    for (const f of files) {
+      const src = fs.readFileSync(f, 'utf8');
+      const keys = [];
+      for (const m of src.matchAll(/\btrf?\(\s*(["'`])((?:\\.|(?!\1)[^\\])*)\1/g)) keys.push(unesc(m[2]));
+      for (const m of src.matchAll(/data-i18n(?:-ph|-aria)?="([^"]+)"/g)) keys.push(m[1]);
+      if (f.endsWith('.html')) for (const m of src.matchAll(/<[^>]*\bdata-i18n(?![-\w])[^>]*>([^<]+)</g)) keys.push(m[1].trim().replace(/\s+/g, ' '));
+      for (const m of src.matchAll(/plural\([^,]+,\s*'([^']+)',\s*'([^']+)',\s*'([^']+)'/g)) keys.push(m[1], m[2], m[3]);
+      for (const m of src.matchAll(/I18n\.plural\([^,]+,\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"/g)) keys.push(m[1], m[2], m[3]);
+      for (const k of keys) { if (cyr.test(k)) { used++; if (!dict[k]) missing.add(path.basename(f) + ': ' + k); } }
+    }
+    for (const k of ['{0} идёт через обход. Сеть: {1}', '{0} идут через обход. Сеть: {1}', '{0} идёт через обход', '{0} идут через обход']) assert(dict[k], k);
+    assert(used > 80, 'нашлось слишком мало строк: ' + used);
+    assert.deepStrictEqual([...missing], [], 'нет в словаре:\n' + [...missing].join('\n'));
+  });
+
+  await test('переводы: tr/trf/plural на трёх языках', () => {
+    const i18n = require('../src/i18n');
+    assert(i18n.load([path.join(root, 'i18n', 'translations.json')]));
+    i18n.setLang('ru');
+    assert.strictEqual(i18n.tr('Сервисы'), 'Сервисы');
+    assert.strictEqual(i18n.trf('Осталось {0}', '5 дней'), 'Осталось 5 дней');
+    assert.strictEqual(i18n.plural(5, 'день', 'дня', 'дней'), 'дней');
+    i18n.setLang('en');
+    assert.strictEqual(i18n.tr('Сервисы'), 'Services');
+    assert.strictEqual(i18n.trf('Осталось {0}', 3), '3 left');
+    assert.strictEqual(i18n.plural(1, 'день', 'дня', 'дней'), 'day');
+    assert.strictEqual(i18n.plural(5, 'день', 'дня', 'дней'), 'days');
+    assert.strictEqual(i18n.tr('нет такого ключа'), 'нет такого ключа');
+    i18n.setLang('ce');
+    assert.strictEqual(i18n.tr('Сервисы'), 'Сервисаш');
+    assert.strictEqual(i18n.plural(5, 'день', 'дня', 'дней'), 'де');
+    assert.strictEqual(Object.keys(i18n.table()).length > 100, true);
+    i18n.setLang('xx');
+    assert.strictEqual(i18n.getLang(), 'ce', 'неизвестный язык игнорируется');
+    assert.deepStrictEqual([i18n.fromLocale('ru-RU'), i18n.fromLocale('ce'), i18n.fromLocale('de-DE'), i18n.fromLocale('')], ['ru', 'ce', 'en', 'en']);
+    i18n.setLang('ru');
+  });
+
+  await test('лицензия: сообщения переводятся вслед за языком', () => {
+    const i18n = require('../src/i18n');
+    i18n.setLang('en');
+    const { License } = require('../src/license');
+    const lic = new License({ store: new Store(path.join(tmp, 'li18n')), publicKeyB64: '', machineId: 'x' });
+    assert.strictEqual(lic.verifyKey('bad').reason, 'Invalid key format');
+    assert.strictEqual(lic.describe({ kind: 'not_activated' }), 'The app is not activated. Enter a license or trial key.');
+    i18n.setLang('ru');
+    assert.strictEqual(lic.verifyKey('bad').reason, 'Неверный формат ключа');
+  });
+
   await test('группы ByeDPI: hosts на сервис, между группами --auto=none', () => {
     const [yt, ig] = config.profiles;
     const out = buildGroups([

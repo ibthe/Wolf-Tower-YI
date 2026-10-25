@@ -67,12 +67,12 @@ object NetId {
             "wifi" -> "Wi-Fi"
             "cell" -> {
                 val name = ctx.getSystemService(TelephonyManager::class.java)?.networkOperatorName
-                if (name.isNullOrBlank()) "Мобильная сеть" else "Мобильная сеть ($name)"
+                if (name.isNullOrBlank()) tr("Мобильная сеть") else trf("Мобильная сеть ({0})", name)
             }
-            "other" -> "Другая сеть"
-            else -> "Нет сети"
+            "other" -> tr("Другая сеть")
+            else -> tr("Нет сети")
         }
     } catch (_: Exception) {
-        "Неизвестно"
+        tr("Неизвестно")
     }
 }

@@ -8,6 +8,7 @@ fs.mkdirSync(res, { recursive: true });
 
 const files = [
   [path.join(root, 'profiles', 'profiles.json'), 'profiles.json'],
+  [path.join(root, 'i18n', 'translations.json'), 'translations.json'],
   [path.join(root, 'android', 'app', 'src', 'main', 'assets', 'license_public_key.txt'), 'license_public_key.txt'],
   [path.join(root, 'android', 'app', 'src', 'main', 'assets', 'third_party_licenses.txt'), 'third_party_licenses.txt'],
 ];
